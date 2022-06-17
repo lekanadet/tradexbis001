@@ -2,7 +2,7 @@
   "name": "tradexbis",
   "version": "1.0.0",
   "description": "",
-  "main": "admin.js",
+  "main": "index.js",
   "dependencies": {
     "aws-sdk": "^2.843.0",
     "body-parser": "^1.19.0",
@@ -36,9 +36,13 @@
     "validator": "^13.1.1",
     "yargs": "^16.0.3"
   },
+  "engines": {
+    "node": "16.15.0"
+  },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "repository": {
     "type": "git",
