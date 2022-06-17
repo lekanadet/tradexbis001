@@ -45,7 +45,7 @@ app.use(express.static(publicDirectoryPath))
 app.use('/', userRouter);
 app.use('/', adminRouter);
 
-
-app.listen(8000,() => {
-    console.log("server is up on port 8000")
-})
+var port = process.env.PORT || 5050;
+app.listen(port, () => {
+    console.log("server is up on port" + port);
+});
