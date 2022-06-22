@@ -6,6 +6,7 @@ var db = require('../database/db.js');
 
 
 
+<<<<<<< HEAD
 function isEmailInUse(email){
   return new Promise((resolve, reject) => {
     db.query("CALL check_email(?)", [email], function (err, result) {
@@ -23,6 +24,25 @@ function isEmailInUse(email){
 
 
 
+=======
+
+
+
+
+function isEmailInUse(email){
+    return new Promise((resolve, reject) => {
+      db.query("CALL check_email(?)", [email], function (err, result) {
+            if(!err){
+              //  console.log("EMAIL COUNT : "+result[0][0].v_result);
+                return resolve(result[0][0].v_result === 1);
+            } else {
+                return reject(new Error('Database error!!'));
+            }
+          }
+        );
+    });
+  }
+>>>>>>> d8451a8219e34b8ead58cf572d812b493b10ea3f
 
 
   function isPhoneInUse(phone){
