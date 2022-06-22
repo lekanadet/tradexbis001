@@ -8,10 +8,25 @@ const hbs = require('hbs')
 const pug = require('pug');
 const bodyparser = require('body-parser')
 const cookieParser = require("cookie-parser");
+const { Whitelist } = require("./Whitelist.js");
+const credentials = require("./credentials");
 
 
 
-app.use(cors())
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (Whitelist.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  optionsSuccessStatus: 200,
+};
+
+app.use(credentials);
+
+app.use(cors(corsOptions));
 
 app.use(cookieParser());
 

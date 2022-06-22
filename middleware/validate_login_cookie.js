@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 
 module.exports = {
 
-isLoggedIn: (req, res, next) => {
+isLoggedIn: async (req, res, next) => {
   const token = req.cookies.access_token3;
   if (!token) {
     return res.status(401).send({
@@ -10,7 +10,7 @@ isLoggedIn: (req, res, next) => {
     });
   }
   try {
-    const data = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const data = await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     req.userData = data
     return next();
   } catch (err) {
