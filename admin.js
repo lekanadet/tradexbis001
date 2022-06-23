@@ -127,6 +127,7 @@ value = [currency_id,currency_name,currency_code, currency_symbol,currency_type,
     } 
   
    })      
+<<<<<<< HEAD
 
   /* protected home route for backend testing */
   router.get('/currency-type',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
@@ -141,5 +142,7 @@ value = [currency_id,currency_name,currency_code, currency_symbol,currency_type,
       } 
     
      }) 
+=======
+>>>>>>> 2ed5c02719b665b425c740c698bf171075f92b9a
 
    module.exports = router;   
