@@ -67,11 +67,12 @@ value = [ currency_name,currency_code, currency_symbol,currency_type,currency_wa
 
 
 /* protected home route for active currencies under a particular currency type */
-router.get('/currencies',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
+router.get('/currencies/:id',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
   if (req.userData) { 
     console.log(req.userData)
-
-    db.query("CALL get_currencies();", function (err, result){
+    const currency_id = req.params.id
+    value = [currency_id]
+    db.query("CALL get_currencies(?);", value, function (err, result){
       if (err) throw err;
     console.log(result[0])
     res.json(
@@ -114,8 +115,7 @@ value = [currency_id,currency_name,currency_code, currency_symbol,currency_type,
       if (err) throw err;
     res.json(
       {message: "Currency Updated Details",
-      Currency_Updated_Info: result[0],
-      Currencies_Info: result[1]
+      Currency_Updated_Info: result[0]
 
     })
 
