@@ -8,15 +8,8 @@ const hbs = require('hbs')
 const pug = require('pug');
 const bodyparser = require('body-parser')
 const cookieParser = require("cookie-parser");
-<<<<<<< HEAD
-
-
-
-app.use(cors())
-=======
-const { Whitelist } = require("./Whitelist.js");
-const credentials = require("./credentials");
-
+const credentials = require('./credentials')
+const {Whitelist} = require('./Whitelist')
 
 
 const corsOptions = {
@@ -33,7 +26,6 @@ const corsOptions = {
 app.use(credentials);
 
 app.use(cors(corsOptions));
->>>>>>> d8451a8219e34b8ead58cf572d812b493b10ea3f
 
 app.use(cookieParser());
 
@@ -67,10 +59,7 @@ app.use(express.static(publicDirectoryPath))
 app.use('/', userRouter);
 app.use('/', adminRouter);
 
-<<<<<<< HEAD
 
-=======
->>>>>>> d8451a8219e34b8ead58cf572d812b493b10ea3f
 var port = process.env.PORT || 5050;
 app.listen(port, () => {
     console.log("server is up on port" + port);
