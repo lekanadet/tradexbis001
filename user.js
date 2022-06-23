@@ -15,125 +15,129 @@ var upload = require('./middleware/multer.js');
 
 
 /* User Registration */
-router.post('/user-registration',[
+router.post(
+  "/user-registration",
+  [
+    check("firstname").not().isEmpty().withMessage("Firstname is required"),
+    check("lastname").not().isEmpty().withMessage("Lastname is required"),
+    check("email")
+      .not()
+      .isEmpty()
+      .withMessage("Email is required")
+      .isEmail()
+      .withMessage("Invalid Email"),
+    check("email").custom(async (email) => {
+      const value = await findout.isEmailInUse(email);
+      if (value) {
+        throw new Error("Email is already in Use!!!");
+      }
+    }),
+    check("phone_no")
+      .not()
+      .isEmpty()
+      .withMessage("Phone number is required")
+      .custom(async (phone_no) => {
+        const value = await findout.isPhoneInUse(phone_no);
+        if (value) {
+          throw new Error("Phone number already in use!!!");
+        }
+      }),
+    check("password")
+      .not()
+      .isEmpty()
+      .withMessage("Password is required")
+      .trim()
+      .isLength({ min: 6, max: 24 })
+      .withMessage(
+        "Password must be a minimum of 6 characters and maximum of 24 characters"
+      ),
+    check("confirm_password")
+      .not()
+      .isEmpty()
+      .withMessage("Please type in your password again")
+      .custom(async (confirm_password, { req }) => {
+        const password = req.body.password;
 
-  check('firstname')
-  .not()
-  .isEmpty()
-  .withMessage('Firstname is required'),
-  check('lastname', 'Lastname is really required').not().isEmpty(),
-  check('lastname')
-  .not()
-  .isEmpty()
-  .withMessage('Lastname is required'),
-  check('email')
-  .not()
-  .isEmpty()
-  .withMessage('Email is required')  
-  .isEmail()
-  .withMessage('Invalid Email'),
-  check('email')
-  .custom(async email => {
-     const value = await findout.isEmailInUse(email);
-     if (value) {
-      throw new Error('Email is already in Use!!!');   
-      
-  }
-}),
-check('phone_no')
-.not()
-.isEmpty()
-.withMessage('Phone_no is required'),
-check('phone_no')
-.custom(async phone => {
-     const value = await findout.isPhoneInUse(phone);
-     if (value) {
-      throw new Error('Phone number is already in Use!!!');   
-      
-  }
-}),
-check('password')
-.not()
-.isEmpty()
-.withMessage('Password is required'),
-check('confirm_password', 'Please retype the password above').not().isEmpty(),
-check('confirm_password', 'Passwords do not match').custom((value,{req}) => (value === req.body.password))
+        // If password and confirm password not same
+        // don't allow to sign up and throw error
+        if (password !== confirm_password) {
+          throw new Error("Both passwords must match");
+        }
+      }),
+  ],
 
-]
-
-,(req,res) => {
-  const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-
-            return res.status(422).json( errors.errors[0].msg );
-        } 
-        else{
-
+  (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json(errors.errors[0].msg);
+    } else {
       const firstname = req.body.firstname;
       const lastname = req.body.lastname;
       const email = req.body.email;
       const phone_no = req.body.phone_no;
       const password = req.body.password;
-    
 
-var values = [firstname,lastname,email,phone_no,password]
+      var values = [firstname, lastname, email, phone_no, password];
 
+      db.query("CALL register_user(?,?,?,?,?)", values, function (err, result) {
+        if (err) throw err;
+        console.log(result[0][0].v_secret);
+        code = result[0][0].v_secret;
 
-db.query("CALL register_user(?,?,?,?,?)",values, function (err, result){
-  if (err) throw err;
-       console.log(result[0][0].v_secret)
-       code  = result[0][0].v_secret
+        // Step 1
+        var transporter = nodemailer.createTransport({
+          host: "smtp.mailtrap.io",
+          port: 2525,
+          auth: {
+            user: "af67cd68b9517b",
+            pass: "062462cdc09ad5",
+          },
+        });
+        // const transporter = nodemailer.createTransport({
+        //   host: process.env.SMTP_HOST,
+        //   port: process.env.SMTP_PORT,
+        //   secure: true,
+        //   auth: {
+        //     user: process.env.SMTP_USER,
+        //     pass: process.env.SMTP_PASSWORD,
+        //   },
+        //   tls: {
+        //     rejectUnauthorized: false,
+        //   },
+        // });
 
+        const body =
+          "Congratulations, you have Successfully Registered please use the secret code below to verify your email.\n\n.";
 
-          // Step 1
- const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT,
-  secure: true,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASSWORD
-},
- tls: {
-  rejectUnauthorized: false
-}
-});
-
-const body = 'Congratulations, you have Successfully Registered please use the secret code below to verify your email.\n\n.'
-         
-// Step 2
-let mailOptions = {
-from: "ladetutu@tts-nigeria.com", // TODO: email sender
-to: email, // TODO: email receiver
-subject: 'Email Verification',
-text: body,
-html: 
-`<p>Hello ${req.body.firstname}</p>
+        // Step 2
+        let mailOptions = {
+          from: "okoromivictorsunday@gmail.com", // TODO: email sender
+          to: email, // TODO: email receiver
+          subject: "Email Verification",
+          text: body,
+          html: `<p>Hello ${req.body.firstname}</p>
 <br/>
 <p>${body}</p>
 <br/>
 <br/>
 <p>${code}</p>
-`  
-              
-} 
+`,
+        };
 
-console.log(mailOptions)
+        console.log(mailOptions);
 
-
-// Step 3
-transporter.sendMail(mailOptions, (err, data) => {
-if (err) {
-    return console.log('Error occurs',err);
-}
-return console.log('Email sent!!!');
-});
-res.send({result:result[0][0].v_secret})
-     
-     })
+        // Step 3
+        transporter.sendMail(mailOptions, (err, data) => {
+          if (err) {
+            return console.log("Error occurs", err);
+          }
+          return console.log("Email sent!!!");
+        });
+        res.send({ result: result[0][0].v_secret });
+      });
     }
-   }) 
-
+  }
+);
 
 
 /* Email verification */
@@ -229,14 +233,15 @@ router.post('/verify/:id',
 
 
    // Step 1
- const transporter = nodemailer.createTransport({
-   host: process.env.SMTP_HOST,
-   port: process.env.SMTP_PORT,
-   auth: {
-     user: process.env.SMTP_USER,
-     pass: process.env.SMTP_PASSWORD
- }
- });
+ var transporter = nodemailer.createTransport({
+          host: "smtp.mailtrap.io",
+          port: 2525,
+          auth: {
+            user: "af67cd68b9517b",
+            pass: "062462cdc09ad5",
+          },
+  });
+
  
  const body = 'You requested for a new secret code to verify your email. Please use the code below\n\n.'
           
