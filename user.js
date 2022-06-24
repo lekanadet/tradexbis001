@@ -441,23 +441,23 @@ router.get("/home", validateLoginMiddlewareCookie.isLoggedIn, (req, res) => {
   }
 });
 
-/* protected home route for currency caategories or type */
-router.get(
-  "/currency-type",
-  validateLoginMiddlewareCookie.isLoggedIn,
-  (req, res) => {
-    // an example of a protected route
-    if (req.userData) {
-      console.log(req.userData);
+// /* protected home route for currency caategories or type */
+// router.get(
+//   "/currency-type",
+//   validateLoginMiddlewareCookie.isLoggedIn,
+//   (req, res) => {
+//     // an example of a protected route
+//     if (req.userData) {
+//       console.log(req.userData);
 
-      db.query("CALL get_currency_types();", function (err, result) {
-        if (err) throw err;
-        console.log(result[0]);
-        res.json({ message: "Currency Types", CurrencyTypeInfo: result[0] });
-      });
-    }
-  }
-);
+//       db.query("CALL get_currency_types();", function (err, result) {
+//         if (err) throw err;
+//         console.log(result[0]);
+//         res.json({ message: "Currency Types", CurrencyTypeInfo: result[0] });
+//       });
+//     }
+//   }
+// );
 
 
 module.exports = router;
