@@ -32,6 +32,15 @@ router.get('/currency-type',validateLoginMiddlewareCookie.isLoggedIn,(req,res) =
 router.post('/add-currencies',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { 
   if (req.userData) { 
 
+    db.query("CALL check_currency(?);",[req.body.currency_name], function (err, result){
+      if (err) throw err;
+    
+      if (result[0][0].v_result === 1) {
+  
+         return res.send('Currency already exists')
+        //res.send('Please verify your email take to verify page')
+      } 
+      else {
 
 const currency_name = req.body.currency_name
 const currency_code = req.body.currency_code
@@ -43,25 +52,27 @@ const buy_rate = req.body.buy_rate
 const sell_rate = req.body.sell_rate
 const currency_exchange_rate = req.body.currency_exchange_rate
 //const status = req.body.status
-const deposit_charge = req.body.deposit_charge
-const withdrawal_charge = req.body.withdrawal_charge
+const minimum_deposit_limit = req.body.minimum_deposit_limit
+const maximum_deposit_limit = req.body.maximum_deposit_limit
 const minimum_withdrawal_limit = req.body.minimum_withdrawal_limit
 const maximum_withdrawal_limit = req.body.maximum_withdrawal_limit
 
 
 value = [ currency_name,currency_code, currency_symbol,currency_type,currency_wallet_address,buy_rate,sell_rate,
-  currency_exchange_rate,deposit_charge,withdrawal_charge,minimum_withdrawal_limit,maximum_withdrawal_limit]
+  currency_exchange_rate,minimum_deposit_limit,maximum_deposit_limit,minimum_withdrawal_limit,maximum_withdrawal_limit]
 
 
     db.query("CALL add_currency(?,?,?,?,?,?,?,?,?,?,?,?);", value,function (err, result){
       if (err) throw err;
     res.json(
-      {message: "Currency Types",
+      {message: "Currencies",
       Currencies_Info: result[0]
-    })
+         })
 
-    })
-    } 
+       })
+      } 
+     })
+    }
   
    })        
 
@@ -101,14 +112,14 @@ const buy_rate = req.body.buy_rate
 const sell_rate = req.body.sell_rate
 const currency_exchange_rate = req.body.currency_exchange_rate
 const status = req.body.status
-const deposit_charge = req.body.deposit_charge
-const withdrawal_charge = req.body.withdrawal_charge
+const minimum_deposit_limit = req.body.minimum_deposit_limit
+const maximum_deposit_limit = req.body.maximum_deposit_limit
 const minimum_withdrawal_limit = req.body.minimum_withdrawal_limit
 const maximum_withdrawal_limit = req.body.maximum_withdrawal_limit
 
 
 value = [currency_id,currency_name,currency_code, currency_symbol,currency_type,currency_exchange_rate,buy_rate,
-  sell_rate,status,deposit_charge,withdrawal_charge,minimum_withdrawal_limit,maximum_withdrawal_limit]
+  sell_rate,status,minimum_deposit_limit,maximum_deposit_limit,minimum_withdrawal_limit,maximum_withdrawal_limit]
 
 
     db.query("CALL update_currency(?,?,?,?,?,?,?,?,?,?,?,?,?);", value,function (err, result){
@@ -123,5 +134,30 @@ value = [currency_id,currency_name,currency_code, currency_symbol,currency_type,
     } 
   
    })      
+
+
+
+
+
+
+
+
+   /* protected home route for currency caategories or type */
+router.get('/get-all-users',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
+  if (req.userData) { 
+    console.log(req.userData)
+
+    db.query("CALL get_users();", function (err, result){
+      if (err) throw err;
+    console.log(result[0])
+    res.json(
+      {message: "Currency Types",
+      User_Info: result[0]
+    })
+
+    })
+    } 
+  
+   })   
 
    module.exports = router;   

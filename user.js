@@ -42,6 +42,7 @@ router.post(
           throw new Error("Phone number already in use!!!");
         }
       }),
+      check("country").not().isEmpty().withMessage("Country is required"),
     check("password")
       .not()
       .isEmpty()
@@ -76,10 +77,11 @@ router.post(
       const email = req.body.email;
       const phone_no = req.body.phone_no;
       const password = req.body.password;
+      const country = req.body.country;
 
-      var values = [firstname, lastname, email, phone_no, password];
+      var values = [firstname, lastname, email, phone_no, password, country];
 
-      db.query("CALL register_user(?,?,?,?,?)", values, function (err, result) {
+      db.query("CALL register_user(?,?,?,?,?,?)", values, function (err, result) {
         if (err) throw err;
         console.log(result[0][0].v_secret);
         code = result[0][0].v_secret;
@@ -138,6 +140,7 @@ router.post(
     }
   }
 );
+
 
 
 /* Email verification */
@@ -315,10 +318,13 @@ router.post('/login2000',[
 
    else  {
 
-    db.query("CALL authentication(?,?);",[req.body.email,req.body.password], function (err, result){
+    db.query("CALL authentication(?,?,?,?,?);",
+    [req.body.email,req.body.password,req.body.ip,req.body.country,req.body.city],
+     function (err, result){
       if (err) throw err;
     
       if (result[0][0].v_result === 1) {
+
 
         const token = jwt.sign({
           email: req.body.email,
@@ -328,6 +334,7 @@ router.post('/login2000',[
           userType: result[1][0].user_type,
           IdStatus: result[1][0].id_card_status,
           phoneStatus: result[1][0].phone_status,
+          login_id: result[2][0].v_id2
         },
         process.env.ACCESS_TOKEN_SECRET, {
           expiresIn: process.env.ACCESS_TOKEN_LIFE
@@ -423,10 +430,17 @@ router.post('/login2000',[
 
   /* Log out and clear cookie */
   router.get("/logout2000", validateLoginMiddlewareCookie.isLoggedIn, (req, res) => {
+    if (req.userData) { 
+      id = req.userData.login_id
+      db.query("CALL update_login_logs(?);",[id], function (err, result){
+        if (err) throw err;
+      
     return res
       .clearCookie("access_token3")
       .status(200)
-      .json({ message: "Successfully logged out 😏 🍀" });
+      .json({ message: "Successfully logged out 😏 🍀", time: result[0][0].signed_out_at });
+      })
+    }
   });
 
 
