@@ -445,7 +445,7 @@ router.post('/login2000',[
 
 
   /* protected home route for backend testing */
-  router.get('/home',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
+router.get('/home',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
     if (req.userData) { 
       console.log(req.userData)
       res.json({message: "Home Page",userDetails: req.userData})

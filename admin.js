@@ -77,12 +77,13 @@ value = [ currency_name,currency_code, currency_symbol,currency_type,currency_wa
    })        
 
 
+   
 /* protected home route for active currencies under a particular currency type */
 router.get('/currencies/:id',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
   if (req.userData) { 
     console.log(req.userData)
-    const currency_id = req.params.id
-    value = [currency_id]
+    const currency_type_id = req.params.id
+    value = [currency_type_id]
     db.query("CALL get_currencies(?);", value, function (err, result){
       if (err) throw err;
     console.log(result[0])
@@ -95,6 +96,27 @@ router.get('/currencies/:id',validateLoginMiddlewareCookie.isLoggedIn,(req,res) 
     } 
   
    })  
+
+
+/*****************New****************************** */
+/* protected home route to get all the details of a selected currency*/ 
+router.get('/selected-currency-details/:id',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
+  if (req.userData) { 
+    
+    const currency_id = req.params.id
+    value = [currency_id]
+
+    db.query("CALL get_selected_currency_details(?);", value, function (err, result){
+      if (err) throw err;
+    console.log(result[0])
+    res.json(
+      {message: "Selected Currency Details",
+      CurrencyDetails: result[0]})
+
+    })
+    } 
+  
+   })     
    
    
 /* protected route to add new currencies under a particular currency type */
@@ -142,7 +164,7 @@ value = [currency_id,currency_name,currency_code, currency_symbol,currency_type,
 
 
 
-   /* protected home route for currency caategories or type */
+/* protected home route to get all users details */
 router.get('/get-all-users',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
   if (req.userData) { 
     console.log(req.userData)
@@ -159,5 +181,116 @@ router.get('/get-all-users',validateLoginMiddlewareCookie.isLoggedIn,(req,res) =
     } 
   
    })   
+
+
+   /*****************New****************************** */
+/* protected route to get selected user's details */
+router.get('/get-user-details/:id',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
+  if (req.userData) { 
+
+    const user_id = req.params.id
+    value = [user_id]
+
+    db.query("CALL get_user_details(?);", value, function (err, result){
+      if (err) throw err;
+    console.log(result[0])
+    res.json(
+      {message: "User Details",
+      UserDetails: result[0]
+    })
+
+    })
+    } 
+  })
+  
+
+
+   /*****************New****************************** */
+/* protected route to update selected user's status Active or Ban*/
+router.get('/update-user-status/:id',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
+  if (req.userData) { 
+
+    const user_id = req.params.id
+    const status = req.body.user_status
+    value = [user_id,status]
+
+    db.query("CALL update_user_status(?,?);", value, function (err, result){
+      if (err) throw err;
+    console.log(result[0])
+    res.json(
+      {message: "User Updated Details",
+      UserUpdatedDetails: result[0]
+    })
+
+    })
+    } 
+  
+   })    
+  
+  
+
+   /*****************New****************************** */
+/* protected route to get selected user's login log history */
+router.get('/user-login-log/:id',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
+  if (req.userData) { 
+
+    const user_id = req.params.id
+    value = [user_id]
+
+    db.query("CALL user_login_log(?);", value, function (err, result){
+      if (err) throw err;
+    console.log(result[0])
+    res.json(
+      {message: "User Login Logs",
+      UserLoginLogs: result[0]
+    })
+
+    })
+    } 
+  })   
+
+
+   /*****************New****************************** */
+/* protected route to get selected user's deposit transaction history */
+router.get('/deposit-history/:id',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
+  if (req.userData) { 
+
+    const user_id = req.params.id
+    value = [user_id]
+
+    db.query("CALL user_deposit_history2(?);", value, function (err, result){
+      if (err) throw err;
+    console.log(result[0])
+    res.json(
+      {message: "User Deposit History",
+      UserDepositHistory: result[0]
+    })
+
+    })
+    } 
+  })     
+
+
+
+     /*****************New****************************** */
+/* protected route to get selected user's deposit transaction history */
+router.get('/withdrawal-history/:id',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
+  if (req.userData) { 
+
+    const user_id = req.params.id
+    value = [user_id]
+
+    db.query("CALL user_withdraw_history(?);", value, function (err, result){
+      if (err) throw err;
+    console.log(result[0])
+    res.json(
+      {message: "User Deposit History",
+      UserDepositHistory: result[0]
+    })
+
+    })
+    } 
+  })  
+   
 
    module.exports = router;   
