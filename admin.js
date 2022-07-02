@@ -291,6 +291,128 @@ router.get('/withdrawal-history/:id',validateLoginMiddlewareCookie.isLoggedIn,(r
     })
     } 
   })  
+
+
+
+     /*****************New****************************** */
+/* protected route to get all pending deposit transactions */
+router.get('/pending-deposit',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
+  if (req.userData) { 
+
+
+    db.query("CALL pending_deposit();", function (err, result){
+      if (err) throw err;
+    console.log(result[0])
+    res.json(
+      {message: "Pending Deposit",
+      PendingDeposit: result[0]
+    })
+
+    })
+    } 
+  })  
+  
+  
+
+       /*****************New****************************** */
+/* protected route to get all rejected deposit transactions */
+router.get('/rejected-deposit',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
+  if (req.userData) { 
+
+
+    db.query("CALL rejected_deposit();", function (err, result){
+      if (err) throw err;
+    console.log(result[0])
+    res.json(
+      {message: "Rejected Deposit",
+      RejectedDeposit: result[0]
+    })
+
+    })
+    } 
+  })    
+
+
+
+       /*****************New****************************** */
+/* protected route to get all accepted deposit transactions */
+router.get('/accepted-deposit',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
+  if (req.userData) { 
+
+
+    db.query("CALL accepted_deposit();", function (err, result){
+      if (err) throw err;
+    console.log(result[0])
+    res.json(
+      {message: "Accepted Deposit",
+      AcceptedDeposit: result[0]
+    })
+
+    })
+    } 
+  })   
+
+
+
+     /*****************New****************************** */
+/* protected route to get all pending withdrawal transactions */
+router.get('/pending-withdrawal',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
+  if (req.userData) { 
+
+
+    db.query("CALL pending_withdrawal();", function (err, result){
+      if (err) throw err;
+    console.log(result[0])
+    res.json(
+      {message: "Pending Withdrawal",
+      PendingWithdrawal: result[0]
+    })
+
+    })
+    } 
+  })    
+
+
+
+     /*****************New****************************** */
+/* protected route to get all accepted withdrawals transactions */
+router.get('/accepted-withdrawal',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
+  if (req.userData) { 
+
+
+    db.query("CALL accepted_withdrawals();", function (err, result){
+      if (err) throw err;
+    console.log(result[0])
+    res.json(
+      {message: "Accepted Withdrawal",
+      AcceptedWithdrawal: result[0]
+    })
+
+    })
+    } 
+  }) 
+  
+  
+
+     /*****************New****************************** */
+/* protected route to get all rejected withdrawals transactions */
+router.get('/rejected-withdrawal',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
+  if (req.userData) { 
+
+
+    db.query("CALL rejected_withdrawals();", function (err, result){
+      if (err) throw err;
+    console.log(result[0])
+    res.json(
+      {message: "Rejected Withdrawal",
+      RejectedWithdrawal: result[0]
+    })
+
+    })
+    } 
+  })    
+       
+     
    
 
    module.exports = router;   
