@@ -43,6 +43,7 @@ app.use(bodyparser.json())
 
 var userRouter = require('./user')
 var adminRouter = require('./admin')
+var homePageRouter = require('./homepage')
 
 // Define paths for express config
 const publicDirectoryPath = path.join(__dirname,'./public')
@@ -61,6 +62,7 @@ app.use(express.static(publicDirectoryPath))
 
 app.use('/', userRouter);
 app.use('/', adminRouter);
+app.use('/', homePageRouter);
 
 
 var port = process.env.PORT || 5050;

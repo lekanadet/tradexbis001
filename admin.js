@@ -374,7 +374,6 @@ router.get('/pending-withdrawal',validateLoginMiddlewareCookie.isLoggedIn,(req,r
 
 
 
-     /*****************New****************************** */
 /* protected route to get all accepted withdrawals transactions */
 router.get('/accepted-withdrawal',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
   if (req.userData) { 
@@ -394,7 +393,7 @@ router.get('/accepted-withdrawal',validateLoginMiddlewareCookie.isLoggedIn,(req,
   
   
 
-     /*****************New****************************** */
+  
 /* protected route to get all rejected withdrawals transactions */
 router.get('/rejected-withdrawal',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
   if (req.userData) { 
@@ -411,6 +410,56 @@ router.get('/rejected-withdrawal',validateLoginMiddlewareCookie.isLoggedIn,(req,
     })
     } 
   })    
+
+
+
+
+/* protected route to get to authorize or reject all deposits transactions */
+router.put('/authorize-deposit/:id',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
+  if (req.userData) { 
+
+    const deposit_id = req.params.id
+    const authorization = req.body.authorization // 'value should = Accepted or Rejected'
+    const rejection_reason = req.body.rejection_reason // 'this field only shows and thus supplied if the authorization value is Rejected'
+    values = [deposit_id,authorization,rejection_reason]
+
+    db.query("CALL authorize_deposit_transaction(?,?,?);", values, function (err, result){
+      if (err) throw err;
+    
+    res.json(
+      {message: "Operation Completed"
+    })
+
+    })
+    } 
+  })   
+  
+  
+
+
+/* protected route to get to authorize or reject all withdrawals transactions */  
+router.put('/authorize-withdrawal/:id',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
+  if (req.userData) { 
+
+    const withdawal_id = req.params.id
+    const authorization = req.body.authorization // 'value should = Accepted or Rejected'
+    const rejection_reason = req.body.rejection_reason // 'this field only shows and thus supplied if the authorization value is Rejected'
+    values = [withdawal_id,authorization,rejection_reason]
+
+    db.query("CALL authorize_withdawal_transaction(?,?,?);", values, function (err, result){
+      if (err) throw err;
+    
+    res.json(
+      {message: "Operation Completed"
+    })
+
+    })
+    } 
+  })   
+
+
+
+
        
      
    
