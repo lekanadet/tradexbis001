@@ -8,7 +8,7 @@ const validateLoginMiddlewareCookie = require('./middleware/validate_login_cooki
 
 
 
-/* protected home route for currency caategories or type */
+/* protected route for currency caategories or type */
 router.get('/currency-type',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
   if (req.userData) { 
     console.log(req.userData)
@@ -78,7 +78,7 @@ value = [ currency_name,currency_code, currency_symbol,currency_type,currency_wa
 
 
    
-/* protected home route for active currencies under a particular currency type */
+/* protected route for active currencies under a particular currency type */
 router.get('/currencies/:id',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
   if (req.userData) { 
     console.log(req.userData)
@@ -99,7 +99,7 @@ router.get('/currencies/:id',validateLoginMiddlewareCookie.isLoggedIn,(req,res) 
 
 
 /*****************New****************************** */
-/* protected home route to get all the details of a selected currency*/ 
+/* protected route to get all the details of a selected currency*/ 
 router.get('/selected-currency-details/:id',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
   if (req.userData) { 
     
@@ -164,7 +164,7 @@ value = [currency_id,currency_name,currency_code, currency_symbol,currency_type,
 
 
 
-/* protected home route to get all users details */
+/* protected route to get all users details */
 router.get('/get-all-users',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
   if (req.userData) { 
     console.log(req.userData)
@@ -302,10 +302,11 @@ router.get('/pending-deposit',validateLoginMiddlewareCookie.isLoggedIn,(req,res)
 
     db.query("CALL pending_deposit();", function (err, result){
       if (err) throw err;
-    console.log(result[0])
+    console.log(result[0][0])
     res.json(
       {message: "Pending Deposit",
-      PendingDeposit: result[0]
+      PendingDeposit: result[0],
+      check: result[0][0]
     })
 
     })
@@ -459,6 +460,117 @@ router.put('/authorize-withdrawal/:id',validateLoginMiddlewareCookie.isLoggedIn,
 
 
 
+/* protected route to get all transactions */
+router.get('/get-transaction-report',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { 
+  if (req.userData) { 
+   
+
+    db.query("CALL transaction_report();", function (err, result){
+      if (err) throw err;
+    console.log(result[0])
+    res.json(
+      {message: "Transactions Report",
+      result: result[0]
+    })
+
+    })
+    } 
+  
+   }) 
+
+
+
+   /* protected route to get all identity authorization request list */ 
+router.get('/get-identity-authorization-req-list',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { 
+  if (req.userData) { 
+   
+
+    db.query("CALL identity_authorization_list();", function (err, result){
+      if (err) throw err;
+  
+    res.json(
+      {message: "Identity Authorization Request List",
+      result: result[0]
+    })
+
+    })
+    } 
+  
+   }) 
+
+
+
+   /* protected route to get selected identity authorization request details */ 
+   router.get('/get-selected-identity-auth-req-details/:id',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { 
+    if (req.userData) { 
+     
+
+      id = req.params.id
+      db.query("CALL select_identity_details(?);", [id], function (err, result){
+        if (err) throw err;
+    
+      res.json(
+        {message: "Selected Identity Authorization Request Details",
+        result: result[0]
+      })
+  
+      })
+      } 
+    
+     })    
+
+
+
+/* protected route to get to authorize or reject identity authorization request transactions */  
+router.post('/authorize-identity/:id/:id2',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
+  if (req.userData) { 
+
+    const id = req.params.id
+    const user_id = req.params.id2
+    const authorization = req.body.authorization // 'value should = Accepted or Rejected'
+    const rejection_reason = req.body.rejection_reason // 'this field only shows and thus supplied if the authorization value is Rejected'
+    values = [id,user_id,authorization,rejection_reason]
+
+    db.query("CALL authorize_identity(?,?,?,?);", values, function (err, result){
+      if (err) throw err;
+    
+
+      if (result[0][0].v_outcome === 'Rejected') {
+        console.log('send email')
+      }
+      else  if(result[0][0].v_outcome === 'Accepted'){
+        console.log('Do not send email')
+      }
+
+    res.json(
+      {message: "Operation Completed",
+      operation_result: result[0][0]
+    })
+
+    })
+    } 
+  }) 
+  
+  
+
+
+   /* protected route to get all identity status list */ 
+   router.get('/get-identity-status-list',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { 
+    if (req.userData) { 
+     
+  
+      db.query("CALL identity_status_list();", function (err, result){
+        if (err) throw err;
+    
+      res.json(
+        {message: "Identity Status List",
+        result: result[0]
+      })
+  
+      })
+      } 
+    
+     })   
 
        
      

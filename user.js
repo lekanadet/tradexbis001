@@ -323,18 +323,38 @@ router.post('/login2000',[
      function (err, result){
       if (err) throw err;
     
-      if (result[0][0].v_result === 1) {
+      if (result[0][0].v_result === 1) {  //1
+        
+        email_auth = req.body.email,
+        userId_auth = result[1][0].user_id,
+        firstname_auth = result[1][0].firstname,
+        userStatus_auth = result[1][0].user_status,
+        userType_auth= result[1][0].user_type,
+        IdStatus_auth = result[1][0].id_card_status,
+        phoneStatus_auth = result[1][0].phone_status,
+        login_id_auth = result[2][0].v_id2
+
+        db.query("CALL check_user_status(?);",[email], function (err, result){
+          if (err) throw err;
+       
+          if (result[0][0].v_result === 0) {
+
+            return res.send('Your account has been banned')  
+
+       } 
+
+        else if (result[0][0].v_result === 1){
 
 
         const token = jwt.sign({
-          email: req.body.email,
-          userId: result[1][0].user_id,
-          firstname: result[1][0].firstname,
-          userStatus: result[1][0].user_status,
-          userType: result[1][0].user_type,
-          IdStatus: result[1][0].id_card_status,
-          phoneStatus: result[1][0].phone_status,
-          login_id: result[2][0].v_id2
+          email: email_auth,
+          userId: userId_auth,
+          firstname: firstname_auth,
+          userStatus: userStatus_auth,
+          userType: userType_auth,
+          IdStatus: IdStatus_auth,
+          phoneStatus: phoneStatus_auth,
+          login_id: login_id_auth
         },
         process.env.ACCESS_TOKEN_SECRET, {
           expiresIn: process.env.ACCESS_TOKEN_LIFE
@@ -347,8 +367,9 @@ router.post('/login2000',[
     })
     .status(200)
     .json({ message: "Logged in successfully 😊 👌" });
-
-      }
+  }
+})
+      } // 1
       else  {
         res.send('user or password not correct')  
       }
