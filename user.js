@@ -109,7 +109,7 @@ router.post(
         // });
 
         const body =
-          "Congratulations, you have Successfully Registered please use the secret code below to verify your email.\n\n.";
+          "Congratulations, you have Successfully Registered please use the secret code below to verify your email.\n The Code will expire in 10 minutes.\n\n";
 
         // Step 2
         let mailOptions = {
@@ -246,7 +246,7 @@ router.post('/verify/:id',
   });
 
  
- const body = 'You requested for a new secret code to verify your email. Please use the code below\n\n.'
+ const body = 'You requested for a new secret code to verify your email. Please use the code below.\n Code expires in 10 minutes.\n\n'
           
  // Step 2
  let mailOptions = {
@@ -282,7 +282,9 @@ transporter.sendMail(mailOptions, (err, data) => {
 })
 
 
- /* Login task using jwt and cookie */
+
+
+/* Login task using jwt and cookie */
 router.post('/login2000',[
   
   check('email')
@@ -378,6 +380,183 @@ router.post('/login2000',[
   })
 }
 })
+
+
+router.post('/forget-password',[
+  
+  check('email')
+  .not()
+  .isEmpty()
+  .withMessage('Email is required')  
+  .isEmail()
+  .withMessage('Invalid Email'),
+  check("email").custom(async (email) => {
+    const value = await findout.isEmailExisting(email);
+    if (value) {
+      throw new Error("Email does not exists in our system!!!");
+    }
+  })
+  ],
+(req,res) => {
+  const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+
+            return res.status(422).json( errors.errors[0].msg );
+        }
+        else {
+
+          const email = req.body.email;
+    
+          var value = [email];
+    
+          db.query("CALL generate_forget_password_secret(?)", value, function (err, result) {
+            if (err) throw err;
+
+            console.log(result[0][0].v_secret2)
+            console.log(result[1][0].firstname)
+       
+            code  = result[0][0].v_secret2
+            firstname = result[1][0].firstname
+    
+            // Step 1
+            var transporter = nodemailer.createTransport({
+              host: "smtp.mailtrap.io",
+              port: 2525,
+              auth: {
+                user: "af67cd68b9517b",
+                pass: "062462cdc09ad5",
+              },
+            });
+    
+            const body =
+              "Use the code below to verify your email in other to set a new password.\n Code will expire in 10 minutes.\n\n";
+    
+            // Step 2
+            let mailOptions = {
+              from: "okoromivictorsunday@gmail.com", // TODO: email sender
+              to: email, // TODO: email receiver
+              subject: "Forget Password Email Verification",
+              text: body,
+              html: `<p>Hello ${firstname}</p>
+                     <br/>
+                     <p>${body}</p>
+                     <br/>
+                     <br/>
+                     <p>${code}</p>`
+                                    
+            };
+    
+            console.log(mailOptions);
+    
+            // Step 3
+            transporter.sendMail(mailOptions, (err, data) => {
+              if (err) {
+                return console.log("Error occurs", err);
+              }
+              return console.log("Email sent!!!");
+            });
+            res.send({ result: result[0][0].v_secret2});
+          });
+
+        }
+});
+
+
+router.post('/verify-forget-password-secret/:id',
+[check('secret')
+.not()
+.isEmpty()
+.withMessage('Please enter secret code sent to your email'),
+],
+
+(req,res) => {
+  const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+
+            return res.status(422).json( errors.errors[0].msg );
+        } 
+        else{
+    
+  email = req.params.id
+  secret = req.body.secret
+  message = ' Secret Key has expired'
+ 
+  db.query("CALL check_secret(?,?);", [email,secret], function (err, result){
+    if (err) throw err; 
+    if (result[0][0].v_out === 0) {
+      return res.send("wrong code entered give option to request for another code") // resend secret API
+    } 
+    else if (result[0][0].v_out === 1) { 
+
+      db.query("CALL check_token_expiry(?,?);", [email,secret], function (err, result){
+        if (err) throw err; 
+        if (result[0][0].v_out === 0) {
+          db.query("CALL effect_expired_token(?,?);",[email,secret], function (err, result){
+            if (err) throw err; 
+            //return res.send("Secret Key has expired please resend another one") / resend secret API
+              res.send('Secret Expired option to resend token') //resend secret API
+          })
+        } 
+
+        else {
+          
+          return res.send("Token Correct send to password reset page")
+        
+        }
+})
+}
+})
+}
+})  
+
+
+
+router.post('/update-new-password/:id',
+[check("password")
+.not()
+.isEmpty()
+.withMessage("Password is required")
+.trim()
+.isLength({ min: 6, max: 24 })
+.withMessage(
+  "Password must be a minimum of 6 characters and maximum of 24 characters"
+),
+check("confirm_password")
+.not()
+.isEmpty()
+.withMessage("Please type in your password again")
+.custom(async (confirm_password, { req }) => {
+  const password = req.body.password;
+
+  // If password and confirm password not same
+  // don't allow to sign up and throw error
+  if (password !== confirm_password) {
+    throw new Error("Both passwords must match");
+  }
+})
+],
+
+(req,res) => {
+  const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+
+            return res.status(422).json( errors.errors[0].msg );
+        } 
+        else{
+    
+          const email = req.params.id;
+          const password = req.body.password;
+ 
+  db.query("CALL update_new_password(?,?);", [email,password], function (err, result){
+    if (err) throw err; 
+    res.json(
+      {message: "New Password Updated",
+    })
+})
+}
+})  
+
+
 
 
   /* Login task using jwt only  */

@@ -305,8 +305,7 @@ router.get('/pending-deposit',validateLoginMiddlewareCookie.isLoggedIn,(req,res)
     console.log(result[0][0])
     res.json(
       {message: "Pending Deposit",
-      PendingDeposit: result[0],
-      check: result[0][0]
+      PendingDeposit: result[0]
     })
 
     })
@@ -573,7 +572,168 @@ router.post('/authorize-identity/:id/:id2',validateLoginMiddlewareCookie.isLogge
      })   
 
        
+/* protected route to get all deposit transactions */
+router.get('/all-deposit',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
+  if (req.userData) { 
+
+
+    db.query("CALL all_deposit();", function (err, result){
+      if (err) throw err;
+    console.log(result[0])
+    res.json(
+      {message: "All Deposit",
+      result: result[0]
+    })
+
+    })
+    } 
+  }) 
+  
+  
+
+/* protected route to get all deposit transactions */
+router.get('/all-withdrawal',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
+  if (req.userData) { 
+
+
+    db.query("CALL all_withdrawal();", function (err, result){
+      if (err) throw err;
+    console.log(result[0])
+    res.json(
+      {message: "All Withdrawal",
+      result: result[0]
+    })
+
+    })
+    } 
+  })     
+
+
+
+
+/* protected route to get graph data for deposit vs currencies  */
+router.get('/deposit-graph',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
+  if (req.userData) { 
+
+
+    db.query("CALL deposit_graph();", function (err, result){
+      if (err) throw err;
+    console.log(result[0])
+    res.json(
+      {message: "Deposit Graph Data",
+      result: result[0]
+    })
+
+    })
+    } 
+  })   
+
+
+
+
+/* protected route to get graph data for withraws vs currencies  */
+router.get('/withdrawal-graph',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
+  if (req.userData) { 
+
+
+    db.query("CALL withdrawal_graph();", function (err, result){
+      if (err) throw err;
+    console.log(result[0])
+    res.json(
+      {message: "Withdrawal Graph Data",
+      result: result[0]
+    })
+
+    })
+    } 
+  })   
+
+
+
+/* protected route to search users using email as the search string  */
+router.get('/user-email-search',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
+  if (req.userData) { 
      
+    
+     const search_string = req.body.search_string
+     value = [search_string]
+
+    db.query("CALL user_email_search(?);",value, function (err, result){
+      if (err) throw err;
+    console.log(result[0])
+    res.json(
+      {message: "User Search Result Using Email",
+      result: result[0]
+    })
+
+    })
+    } 
+  })   
+
+
+
+
+/* protected route to search users using user_status as the search string  */
+router.get('/user-status-search',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
+  if (req.userData) { 
+     
+    
+     const search_string = req.body.search_string
+     value = [search_string]
+
+    db.query("CALL user_status_search(?);",value, function (err, result){
+      if (err) throw err;
+    console.log(result[0])
+    res.json(
+      {message: "User Search Result Using Status",
+      result: result[0]
+    })
+
+    })
+    } 
+  })     
+
+
+/* protected route to search transaction report contents  */
+router.get('/transaction-report-search',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
+  if (req.userData) { 
+     
+    
+     const search_string = req.body.search_string
+     value = [search_string]
+
+    db.query("CALL transaction_report_search(?);",value, function (err, result){
+      if (err) throw err;
+    console.log(result[0])
+    res.json(
+      {message: "Transaction Report Search Result",
+      result: result[0]
+    })
+
+    })
+    } 
+  }) 
+
+
+
+/* protected route to search currencies contents */
+router.get('/currency-search',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
+  if (req.userData) { 
+
+     search_string = req.body.search_string
+    db.query("CALL currency_search(?);",[search_string], function (err, result){
+      if (err) throw err;
+    console.log(result[0])
+    res.json(
+      {message: "Currency Search Result",
+      result: result[0]
+    })
+
+    })
+    } 
+  })    
+
+
    
 
    module.exports = router;   
