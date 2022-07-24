@@ -4,6 +4,7 @@ const express = require('express')
 var router = express.Router();
 var db = require('./database/db.js');
 const validateLoginMiddlewareCookie = require('./middleware/validate_login_cookie.js');
+const id = require('faker/lib/locales/id_ID/index.js');
 
 
 
@@ -717,11 +718,14 @@ router.get('/transaction-report-search',validateLoginMiddlewareCookie.isLoggedIn
 
 
 /* protected route to search currencies contents */
-router.get('/currency-search',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
+router.get('/currency-search/:id',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
   if (req.userData) { 
-
+     
+    const id = req.params.id
      search_string = req.body.search_string
-    db.query("CALL currency_search(?);",[search_string], function (err, result){
+
+     values = [search_string,id]
+    db.query("CALL currency_search(?,?);",values, function (err, result){
       if (err) throw err;
     console.log(result[0])
     res.json(
