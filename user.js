@@ -10,6 +10,7 @@ const jwt = require("jsonwebtoken");
 const validateLoginMiddlewareCookie = require('./middleware/validate_login_cookie.js');
 const Aws = require('aws-sdk')    
 var upload = require('./middleware/multer.js');
+  
 
 
 
@@ -216,7 +217,7 @@ router.post('/verify/:id',
       db.query("CALL check_if_verified(?);",[email], function (err, result){
        if (err) throw err;
    
-       if (result[0][0].v_status === 'Verified') {
+       if (result[0][0].v_result === 'Verified') {
    
           return res.send('Your account has been verified please go ahead and login')
          //res.send('Please verify your email take to verify page')
@@ -462,6 +463,8 @@ router.post('/forget-password',[
 });
 
 
+
+
 router.post('/verify-forget-password-secret/:id',
 [check('secret')
 .not()
@@ -653,54 +656,111 @@ router.get('/home',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an
      }) 
  
 
-router.get('/upload-testpics',(req,res) => { 
+
+
+     router.get('/upload-testpics-multiple',(req,res) => { 
        
-    res.render('upload2',{title: 'Picture Upload Form'})
-   
-   }) 
+      res.render('upload',{title: 'Picture Upload Form'})
+     
+     }) 
 
 
-router.post('/upload-testpictures', upload.single('productimage'), (req, res) => {
-    console.log(req.file) 
+     router.get('/upload-testpics-single',(req,res) => { 
+       
+      res.render('upload2',{title: 'Picture Upload Form'})
+     
+     }) 
   
-    // Now creating the S3 instance which will be used in uploading photo to s3 bucket.
-const s3 = new Aws.S3({
-  accessKeyId:process.env.AWS_ACCESS_KEY_ID2,              
-  secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY2       
-})   
-    
-    const params = {
-        Bucket:process.env.AWS_BUCKET_NAME,      // bucket that we made earlier
-        Key:Date.now() + '_' + req.file.originalname,               // Name of the image
-        Body:req.file.buffer,                   // defining the permissions to get the public link
-        ContentType:"image/jpeg"                 // Necessary to define the image content-type to view the photo in the browser with the link
-    };
   
-   // uplaoding the photo using s3 instance and saving the link in the database.
+  
+  router.post('/upload-testpictures-multiple', upload.array('productimage',3), (req, res) => { // working - Multiple file uploads
+      console.log(req.files) 
+  
+      const s3 = new Aws.S3({
+          accessKeyId:process.env.AWS_ACCESS_KEY_ID2,              
+          secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY2       
+      })
     
-    s3.upload(params,(error,data)=>{
-        if(error){
-            res.status(500).send({"err":error}) 
-        }
-        
-    console.log(data)                     
+      // if(!req.file) {
+      //     return res.send('No Upload selected')
+      // }
+  
+      if(req.files){ files = req.files
+          files.forEach(file => {
+      const params = {
+          Bucket:process.env.AWS_BUCKET_NAME,      // bucket that we made earlier
+          Key:Date.now() + '_' + file.originalname,               // Name of the image
+          Body:file.buffer,                   // defining the permissions to get the public link
+          ContentType:"image/jpeg"                 // Necessary to define the image content-type to view the photo in the browser with the link
+      };
     
-   // saving the information in the database.   
-   value = [data.Location,data.Key] 
-   db.query("CALL add_test_picture(?,?);", value, function (err, result) {   
-  if (err) throw err; 
- // console.log(result[0])
- res.status(200).send({
-  productLocation: data.Location,
-  productKey: data.Key
+     // uplaoding the photo using s3 instance and saving the link in the database.
+      
+      s3.upload(params,(error,data)=>{
+          if(error){
+              res.status(500).send({"err":error}) 
+          }
+          
+      console.log(data)                     
+      
+     // saving the information in the database.   
+     value = [data.Location,data.Key] 
+     db.query("CALL add_test_picture(?,?);", value, function (err, result) {   
+    if (err) throw err; 
+   // console.log(result[0])
+  
+  });
+      })
+  })
+  res.status(200).send('Successfully Uploaded')
+  }
+  
+  })
+  
 
-})
-});
+  
+  router.post('/upload-testpictures-single', upload.single('productimage'), (req, res) => { // working - Single file uploads
+      console.log(req.file) 
+  
+      const s3 = new Aws.S3({
+        accessKeyId:process.env.AWS_ACCESS_KEY_ID2,              
+        secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY2       
     })
-})
-
-   
-
+    
+      // if(!req.file) {
+      //     return res.send('No Upload selected')
+      // }
+  
+      if(req.file) { 
+          file = req.file
+      const params = {
+          Bucket:process.env.AWS_BUCKET_NAME,      // bucket that we made earlier
+          Key:Date.now() + '_' + file.originalname,               // Name of the image
+          Body:file.buffer,                   // defining the permissions to get the public link
+          ContentType:"image/jpeg"                 // Necessary to define the image content-type to view the photo in the browser with the link
+      };
+    
+     // uplaoding the photo using s3 instance and saving the link in the database.
+      
+      s3.upload(params,(error,data)=>{
+          if(error){
+              res.status(500).send({"err":error}) 
+          }
+          
+      console.log(data)                     
+      
+     // saving the information in the database.   
+     value = [data.Location,data.Key] 
+     db.query("CALL add_test_picture(?,?);", value, function (err, result) {   
+    if (err) throw err; 
+   // console.log(result[0])
+  
+  });
+      })
+  res.status(200).send('Successfully Uploaded')
+  }
+  
+  })
           
 
    module.exports = router;   

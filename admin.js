@@ -505,7 +505,7 @@ router.get('/get-identity-authorization-req-list',validateLoginMiddlewareCookie.
     if (req.userData) { 
      
 
-      id = req.params.id
+      const id = req.params.id
       db.query("CALL select_identity_details(?);", [id], function (err, result){
         if (err) throw err;
     

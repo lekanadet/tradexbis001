@@ -1,9 +1,7 @@
-const multer = require('multer')              
+const multer = require('multer') 
 
 
-
-
-   const storage = multer.memoryStorage({
+const storage = multer.memoryStorage({
     destination: function (req, file, callback) {
         if (file.fieldname === "productimage") { // if uploading resume
         callback(null, './pictures');
@@ -27,5 +25,4 @@ const filefilter = (req, file, cb) => {
 const upload = multer({ storage: storage, fileFilter: filefilter });
 
 
-
-module.exports = upload;
+module.exports = upload

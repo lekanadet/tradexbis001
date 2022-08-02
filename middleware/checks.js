@@ -18,10 +18,23 @@ function isEmailInUse(email){
         }
       );
   });
+} 
+
+
+
+function isEmailExisting(email){
+  return new Promise((resolve, reject) => {
+    db.query("CALL check_email(?)", [email], function (err, result) {
+          if(!err){
+            //  console.log("EMAIL COUNT : "+result[0][0].v_result);
+              return resolve(result[0][0].v_result === 0);
+          } else {
+              return reject(new Error('Database error!!'));
+          }
+        }
+      );
+  });
 }
-
-
-
 
 
 
@@ -39,9 +52,30 @@ function isEmailInUse(email){
     });
   }
 
+
+
+
+  function isOldPasswordCorrect(id,password){
+    return new Promise((resolve, reject) => {
+      db.query("CALL check_old_password(?,?)", [id,password], function (err, result) {
+            if(!err){
+              //  console.log("EMAIL COUNT : "+result[0][0].v_result);
+                return resolve(result[0][0].v_result === 0);
+            } else {
+                return reject(new Error('Database error!!'));
+            }
+          }
+        );
+    });
+  }
+
+
+
 module.exports =  {
 
     isEmailInUse,
-    isPhoneInUse
+    isEmailExisting,
+    isPhoneInUse,
+    isOldPasswordCorrect
 
 }

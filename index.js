@@ -42,16 +42,16 @@ app.use(bodyparser.json())
 
 
 var userRouter = require('./user')
+var userExtRouter = require('./user_ext')
 var adminRouter = require('./admin')
 var homePageRouter = require('./homepage')
+
 
 // Define paths for express config
 const publicDirectoryPath = path.join(__dirname,'./public')
 const viewsPath = path.join(__dirname,'./views')
 
 //app.use(express.static(path.join(__dirname, 'public/')));
-
-
 // set up handlebars engine and views location
 app.set('view engine', 'hbs')
 //app.set('view engine', pug);
@@ -61,6 +61,7 @@ app.set('views',viewsPath)
 app.use(express.static(publicDirectoryPath))
 
 app.use('/', userRouter);
+app.use('/', userExtRouter);
 app.use('/', adminRouter);
 app.use('/', homePageRouter);
 
