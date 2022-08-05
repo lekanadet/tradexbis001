@@ -95,7 +95,6 @@ router.get('/currencies/:id',validateLoginMiddlewareCookie.isLoggedIn,(req,res) 
 
     })
     } 
-  
    })  
 
 
@@ -159,9 +158,28 @@ value = [currency_id,currency_name,currency_code, currency_symbol,currency_type,
    })      
 
 
+ 
+/* protected route to update currencies type buy and sell rates */
+router.post('/update-currencies-type/:id',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { 
+  if (req.userData) { 
+
+   const currency_type_id = req.params.id
+   const buy_rate = req.body.buy_rate
+   const sell_rate = req.body.sell_rate
 
 
+   values = [currency_type_id,buy_rate,sell_rate]
 
+
+    db.query("CALL update_currencies_type(?,?,?);", values,function (err, result){
+      if (err) throw err;
+    res.json(
+      {message: "Currency Types Updated"})
+
+    })
+    } 
+  
+   })    
 
 
 
