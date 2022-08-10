@@ -331,11 +331,18 @@ router.post('/login2000',[
         email_auth = req.body.email,
         userId_auth = result[1][0].user_id,
         firstname_auth = result[1][0].firstname,
+        lastname_auth = result[1][0].lastname,
+        photo_auth = result[1][0].photo,
+        country_auth = result[1][0].country,
+        city_auth = result[1][0].city,
+        address_auth = result[1][0].address,
+        zip_auth = result[1][0].zip,
+        idCard_auth = result[1][0].id_card,
         userStatus_auth = result[1][0].user_status,
         userType_auth= result[1][0].user_type,
-        IdStatus_auth = result[1][0].id_card_status,
+        idStatus_auth = result[1][0].id_card_status,
         phoneStatus_auth = result[1][0].phone_status,
-        login_id_auth = result[2][0].v_id2
+        loginId_auth = result[2][0].v_id2
 
         db.query("CALL check_user_status(?);",[email], function (err, result){
           if (err) throw err;
@@ -353,11 +360,18 @@ router.post('/login2000',[
           email: email_auth,
           userId: userId_auth,
           firstname: firstname_auth,
+          lastname: lastname_auth,
+          profile_pic: photo_auth,
+          country: country_auth,
+          city: city_auth,
+          address: address_auth,
+          zip: zip_auth,
+          idCard: idCard_auth,
           userStatus: userStatus_auth,
           userType: userType_auth,
-          IdStatus: IdStatus_auth,
+          idStatus: idStatus_auth,
           phoneStatus: phoneStatus_auth,
-          login_id: login_id_auth
+          loginId: loginId_auth
         },
         process.env.ACCESS_TOKEN_SECRET, {
           expiresIn: process.env.ACCESS_TOKEN_LIFE
