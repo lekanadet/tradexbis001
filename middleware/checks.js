@@ -71,11 +71,45 @@ function isEmailExisting(email){
 
 
 
+  function isIdVerified(id){
+    return new Promise((resolve, reject) => {
+      db.query("CALL check_id_verified(?)", [id], function (err, result) {
+            if(!err){
+              //  console.log("EMAIL COUNT : "+result[0][0].v_result);
+                return resolve(result[0][0].v_result === 1);
+            } else {
+                return reject(new Error('Database error!!'));
+            }
+          }
+        );
+    });
+  } 
+
+
+
+  function isKycSubmitted(id){
+    return new Promise((resolve, reject) => {
+      db.query("CALL check_kyc_ongoing(?)", [id], function (err, result) {
+            if(!err){
+              //  console.log("EMAIL COUNT : "+result[0][0].v_result);
+                return resolve(result[0][0].v_result === 1);
+            } else {
+                return reject(new Error('Database error!!'));
+            }
+          }
+        );
+    });
+  } 
+
+
+
 module.exports =  {
 
     isEmailInUse,
     isEmailExisting,
     isPhoneInUse,
-    isOldPasswordCorrect
+    isOldPasswordCorrect,
+    isIdVerified,
+    isKycSubmitted
 
 }

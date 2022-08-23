@@ -565,11 +565,13 @@ router.get('/id-upload',(req,res) => {
  
  })   
 
+ 
 
 router.post('/id-upload',validateLoginMiddlewareCookie.isLoggedIn,upload.single('productimage'),(req,res) => { 
 
   if (req.userData) { 
-   // user_id = 8
+ 
+    //user_id = 26
   user_id = req.userData.userId
 
   const s3 = new Aws.S3({
@@ -577,7 +579,33 @@ router.post('/id-upload',validateLoginMiddlewareCookie.isLoggedIn,upload.single(
     secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY2       
   })
 
+  db.query("CALL check_id_verified(?);", [user_id], function (err, result) {   
+    if (err) throw err; 
+  
+    if (result[0][0].v_result === 1) {
+  
+      return res.send('Your Identification is okay')
+        //res.send('Please verify your email take to verify page')
+      }
+
+      else {
+
+        db.query("CALL check_kyc_ongoing(?);", [user_id], function (err, result) {   
+          if (err) throw err; 
+        
+          if (result[0][0].v_result === 1) {
+        
+            return res.send('You have an active kyc Verification request. please wait to for our feedback')
+              //res.send('Please verify your email take to verify page')
+            }
+
+          else{
+  
+
   if (req.file) { 
+
+    
+
     file = req.file
 const params = {
     Bucket:process.env.AWS_BUCKET_NAME,      
@@ -597,11 +625,15 @@ console.log(data)
 
 // saving the information in the database.   
 value = [user_id,data.Location] 
+
+
 db.query("CALL id_upload(?,?);", value, function (err, result) {   
 if (err) throw err; 
 
 });
+      
 })
+
 console.log('Id Successfully Uploaded for check')
 res.json(
   {message: "Id Successfully Uploaded for check"})
@@ -611,10 +643,15 @@ res.json(
 res.json(
   {message: "No Attachment"})
 
- }
-}     
-})      
+      }
 
+       }
+    })
+   }
+  })
+    }
+ // }     
+})      
 
 
 
