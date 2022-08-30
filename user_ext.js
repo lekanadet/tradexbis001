@@ -187,7 +187,6 @@ router.get('/get-withdrawal-guide-info/:id',validateLoginMiddlewareCookie.isLogg
   
    
 
-   
 router.get('/deposit-upload',(req,res) => { 
        
     res.render('upload2',{title: 'Picture Upload Form'})
@@ -237,6 +236,7 @@ if(amount_naira > 100000){ //Checking if the is more than 100,000 naira
       if (err) throw err;
    
       var deposit_id = result[0][0].v_deposit_id3
+      var firstname = result[0][0].v_firstname
 
       const s3 = new Aws.S3({
         accessKeyId:process.env.AWS_ACCESS_KEY_ID2,              
@@ -266,11 +266,52 @@ if(amount_naira > 100000){ //Checking if the is more than 100,000 naira
      value = [deposit_id,data.Location] 
      db.query("CALL add_deposit_proof(?,?);", value, function (err, result) {   
     if (err) throw err; 
+
+    
   
-  });
+  });  // end of database access
       })
   console.log('Successfully Uploaded')
   }
+
+   // Step 1
+   var transporter = nodemailer.createTransport({
+    host: "smtp.mailtrap.io",
+    port: 2525,
+    auth: {
+      user: "af67cd68b9517b",
+      pass: "062462cdc09ad5",
+    },
+  });
+
+  // Step 2
+  const body =
+    "We wish to inform you that a deposit transaction occurred on your account with us.\n\n\
+    Your transaction will be completed soon.\n\n\
+    Regards,\n\n\
+    Admin";
+
+  let mailOptions = {
+    from: "okoromivictorsunday@gmail.com", // TODO: email sender
+    to: email, // TODO: email receiver
+    subject: "Deposit Transaction Notification",
+    text: body,
+    html: `<p>Dear ${firstname},</p>
+<br/>
+<p>${body}</p>
+<br/>
+`,
+  };
+
+  console.log(mailOptions);
+
+  // Step 3
+  transporter.sendMail(mailOptions, (err, data) => {
+    if (err) {
+      return console.log("Error occurs", err);
+    }
+    return console.log("Email sent!!!");
+  });
 
     res.json(
       {message: "Deposit Transaction Successful"
@@ -288,6 +329,7 @@ if(amount_naira > 100000){ //Checking if the is more than 100,000 naira
     if (err) throw err;
  
     var deposit_id = result[0][0].v_deposit_id3
+    var firstname = result[0][0].v_firstname
 
     const s3 = new Aws.S3({
       accessKeyId:process.env.AWS_ACCESS_KEY_ID2,              
@@ -323,6 +365,45 @@ if(amount_naira > 100000){ //Checking if the is more than 100,000 naira
     })
 console.log('Successfully Uploaded')
 }
+
+// Step 1
+var transporter = nodemailer.createTransport({
+  host: "smtp.mailtrap.io",
+  port: 2525,
+  auth: {
+    user: "af67cd68b9517b",
+    pass: "062462cdc09ad5",
+  },
+});
+
+// Step 2
+const body =
+  "We wish to inform you that a deposit transaction occurred on your account with us.\n\n\
+  Your transaction will be completed soon.\n\n\
+  Regards,\n\n\
+  Admin";
+
+let mailOptions = {
+  from: "okoromivictorsunday@gmail.com", // TODO: email sender
+  to: email, // TODO: email receiver
+  subject: "Deposit Transaction Notification",
+  text: body,
+  html: `<p>Dear ${firstname},</p>
+<br/>
+<p>${body}</p>
+<br/>
+`,
+};
+
+console.log(mailOptions);
+
+// Step 3
+transporter.sendMail(mailOptions, (err, data) => {
+  if (err) {
+    return console.log("Error occurs", err);
+  }
+  return console.log("Email sent!!!");
+});
 
 
   res.json(
@@ -378,6 +459,7 @@ router.post('/withdraw/:id',validateLoginMiddlewareCookie.isLoggedIn,upload.sing
       if (err) throw err;
    
       var withdrawal_id = result[0][0].v_withdrawal_id3
+      var firstname = result[0][0].v_firstname
 
       const s3 = new Aws.S3({
         accessKeyId:process.env.AWS_ACCESS_KEY_ID2,              
@@ -414,6 +496,45 @@ router.post('/withdraw/:id',validateLoginMiddlewareCookie.isLoggedIn,upload.sing
   console.log('Successfully Uploaded')
   }
 
+  // Step 1
+var transporter = nodemailer.createTransport({
+  host: "smtp.mailtrap.io",
+  port: 2525,
+  auth: {
+    user: "af67cd68b9517b",
+    pass: "062462cdc09ad5",
+  },
+});
+
+// Step 2
+const body =
+  "We wish to inform you that a deposit transaction occurred on your account with us.\n\n\
+  Your transaction will be completed soon.\n\n\
+  Regards,\n\n\
+  Admin";
+
+let mailOptions = {
+  from: "okoromivictorsunday@gmail.com", // TODO: email sender
+  to: email, // TODO: email receiver
+  subject: "Withdrawal Transaction Notification",
+  text: body,
+  html: `<p>Dear ${firstname},</p>
+<br/>
+<p>${body}</p>
+<br/>
+`,
+};
+
+console.log(mailOptions);
+
+// Step 3
+transporter.sendMail(mailOptions, (err, data) => {
+  if (err) {
+    return console.log("Error occurs", err);
+  }
+  return console.log("Email sent!!!");
+});
+
 
     res.json(
       {message: "Withdraw Transaction Successful"
@@ -425,12 +546,13 @@ router.post('/withdraw/:id',validateLoginMiddlewareCookie.isLoggedIn,upload.sing
   }
 
 
-  else {
-console.log('went through less than 100000')
+  else {  // less than 100,000
+
    db.query("CALL withdraw(?,?,?,?,?,?,?,?,?);", values, function (err, result){
     if (err) throw err;
  
     var deposit_id = result[0][0].v_deposit_id3
+    var firstname = result[0][0].v_firstname
 
     const s3 = new Aws.S3({
       accessKeyId:process.env.AWS_ACCESS_KEY_ID2,              
@@ -466,6 +588,45 @@ console.log('went through less than 100000')
     })
 console.log('Successfully Uploaded')
 }
+
+ // Step 1
+ var transporter = nodemailer.createTransport({
+  host: "smtp.mailtrap.io",
+  port: 2525,
+  auth: {
+    user: "af67cd68b9517b",
+    pass: "062462cdc09ad5",
+  },
+});
+
+// Step 2
+const body =
+  "We wish to inform you that a deposit transaction occurred on your account with us.\n\n\
+  Your transaction will be completed soon.\n\n\
+  Regards,\n\n\
+  Admin";
+
+let mailOptions = {
+  from: "okoromivictorsunday@gmail.com", // TODO: email sender
+  to: email, // TODO: email receiver
+  subject: "Withdrawal Transaction Notification",
+  text: body,
+  html: `<p>Dear ${firstname},</p>
+<br/>
+<p>${body}</p>
+<br/>
+`,
+};
+
+console.log(mailOptions);
+
+// Step 3
+transporter.sendMail(mailOptions, (err, data) => {
+  if (err) {
+    return console.log("Error occurs", err);
+  }
+  return console.log("Email sent!!!");
+});
 
 
   res.json(
