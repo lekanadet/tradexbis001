@@ -207,7 +207,7 @@ router.get('/withdraw-upload',(req,res) => {
 router.post('/deposit/:id',validateLoginMiddlewareCookie.isLoggedIn,upload.single('productimage'),(req,res) => { // Authentic One
   if (req.userData) { 
 
-    
+    email = req.userData.email
     currency_id = req.params.id
     user_id = req.userData.userId
     wallet_address = req.body.wallet_address
@@ -237,6 +237,8 @@ if(amount_naira > 100000){ //Checking if the is more than 100,000 naira
    
       var deposit_id = result[0][0].v_deposit_id3
       var firstname = result[0][0].v_firstname
+      var action = result[1][0].v_action
+      var currency = result[1][0].v_currency_name3
 
       const s3 = new Aws.S3({
         accessKeyId:process.env.AWS_ACCESS_KEY_ID2,              
@@ -285,20 +287,23 @@ if(amount_naira > 100000){ //Checking if the is more than 100,000 naira
   });
 
   // Step 2
-  const body =
-    "We wish to inform you that a deposit transaction occurred on your account with us.\n\n\
-    Your transaction will be completed soon.\n\n\
-    Regards,\n\n\
-    Admin";
+  // const body =
+  //   "We wish to inform you that a deposit transaction occurred on your account with us.\n\n\
+  //   Your transaction will be completed soon.\n\n\
+  //   Regards,\n\n\
+  //   Admin";
 
   let mailOptions = {
     from: "okoromivictorsunday@gmail.com", // TODO: email sender
     to: email, // TODO: email receiver
-    subject: "Deposit Transaction Notification",
-    text: body,
+    subject: `${action} Transaction Notification`,
+  //text: body,
     html: `<p>Dear ${firstname},</p>
 <br/>
-<p>${body}</p>
+<p>We wish to inform you that a ${action} transaction for ${currency} occurred on your account with us.\n\n\
+Your transaction will be completed soon.\n\n\
+Regards,\n\n\
+Admin;</p>
 <br/>
 `,
   };
@@ -314,7 +319,7 @@ if(amount_naira > 100000){ //Checking if the is more than 100,000 naira
   });
 
     res.json(
-      {message: "Deposit Transaction Successful"
+      {message: `${action} Transaction Successful`
     })
 
     })
@@ -330,6 +335,8 @@ if(amount_naira > 100000){ //Checking if the is more than 100,000 naira
  
     var deposit_id = result[0][0].v_deposit_id3
     var firstname = result[0][0].v_firstname
+    var action = result[1][0].v_action
+      var currency = result[1][0].v_currency_name3
 
     const s3 = new Aws.S3({
       accessKeyId:process.env.AWS_ACCESS_KEY_ID2,              
@@ -377,20 +384,23 @@ var transporter = nodemailer.createTransport({
 });
 
 // Step 2
-const body =
-  "We wish to inform you that a deposit transaction occurred on your account with us.\n\n\
-  Your transaction will be completed soon.\n\n\
-  Regards,\n\n\
-  Admin";
+// const body =
+//   "We wish to inform you that a deposit transaction occurred on your account with us.\n\n\
+//   Your transaction will be completed soon.\n\n\
+//   Regards,\n\n\
+//   Admin";
 
 let mailOptions = {
   from: "okoromivictorsunday@gmail.com", // TODO: email sender
-  to: email, // TODO: email receiver
-  subject: "Deposit Transaction Notification",
-  text: body,
+  to: email, // TODO: email receive
+  subject: `${action} Transaction Notification`,
+ // text: body,
   html: `<p>Dear ${firstname},</p>
 <br/>
-<p>${body}</p>
+<p>We wish to inform you that a ${action} transaction for ${currency} occurred on your account with us.\n\n\
+Your transaction will be completed soon.\n\n\
+Regards,\n\n\
+Admin;</p>
 <br/>
 `,
 };
@@ -407,7 +417,7 @@ transporter.sendMail(mailOptions, (err, data) => {
 
 
   res.json(
-    {message: "Deposit Transaction Successful"
+    {message: `${action} Transaction Successful`
   })
 
   })
@@ -417,11 +427,12 @@ transporter.sendMail(mailOptions, (err, data) => {
    })   
 
 
+   
 /* protected route for withdrawal transaction information and guide */
 router.post('/withdraw/:id',validateLoginMiddlewareCookie.isLoggedIn,upload.single('productimage'),(req,res) => { // Authentic One
   if (req.userData) { 
 
-    
+    email = req.userData.email
     currency_id = req.params.id
     user_id = req.userData.userId
     bank_name = req.body.bank_name
@@ -460,6 +471,8 @@ router.post('/withdraw/:id',validateLoginMiddlewareCookie.isLoggedIn,upload.sing
    
       var withdrawal_id = result[0][0].v_withdrawal_id3
       var firstname = result[0][0].v_firstname
+      var action = result[1][0].v_action
+      var currency = result[1][0].v_currency_name3
 
       const s3 = new Aws.S3({
         accessKeyId:process.env.AWS_ACCESS_KEY_ID2,              
@@ -507,20 +520,23 @@ var transporter = nodemailer.createTransport({
 });
 
 // Step 2
-const body =
-  "We wish to inform you that a deposit transaction occurred on your account with us.\n\n\
-  Your transaction will be completed soon.\n\n\
-  Regards,\n\n\
-  Admin";
+// const body =
+//   "We wish to inform you that a deposit transaction occurred on your account with us.\n\n\
+//   Your transaction will be completed soon.\n\n\
+//   Regards,\n\n\
+//   Admin";
 
 let mailOptions = {
   from: "okoromivictorsunday@gmail.com", // TODO: email sender
   to: email, // TODO: email receiver
-  subject: "Withdrawal Transaction Notification",
-  text: body,
+  subject: `${action} Transaction Notification`,
+ // text: body,
   html: `<p>Dear ${firstname},</p>
 <br/>
-<p>${body}</p>
+<p>We wish to inform you that a ${action} transaction for ${currency} occurred on your account with us.\n\n\
+Your transaction will be completed soon.\n\n\
+Regards,\n\n\
+Admin;</p>
 <br/>
 `,
 };
@@ -537,7 +553,7 @@ transporter.sendMail(mailOptions, (err, data) => {
 
 
     res.json(
-      {message: "Withdraw Transaction Successful"
+      {message: `${action} Transaction Successful`
     })
 
     })
@@ -553,6 +569,8 @@ transporter.sendMail(mailOptions, (err, data) => {
  
     var deposit_id = result[0][0].v_deposit_id3
     var firstname = result[0][0].v_firstname
+    var action = result[1][0].v_action
+      var currency = result[1][0].v_currency_name3
 
     const s3 = new Aws.S3({
       accessKeyId:process.env.AWS_ACCESS_KEY_ID2,              
@@ -600,20 +618,23 @@ console.log('Successfully Uploaded')
 });
 
 // Step 2
-const body =
-  "We wish to inform you that a deposit transaction occurred on your account with us.\n\n\
-  Your transaction will be completed soon.\n\n\
-  Regards,\n\n\
-  Admin";
+// const body =
+//   "We wish to inform you that a deposit transaction occurred on your account with us.\n\n\
+//   Your transaction will be completed soon.\n\n\
+//   Regards,\n\n\
+//   Admin";
 
 let mailOptions = {
   from: "okoromivictorsunday@gmail.com", // TODO: email sender
   to: email, // TODO: email receiver
-  subject: "Withdrawal Transaction Notification",
-  text: body,
+  subject: `${action} Transaction Notification`,
+ // text: body,
   html: `<p>Dear ${firstname},</p>
 <br/>
-<p>${body}</p>
+<p>We wish to inform you that a ${action} transaction for ${currency} occurred on your account with us.\n\n\
+Your transaction will be completed soon.\n\n\
+Regards,\n\n\
+Admin;</p>
 <br/>
 `,
 };
@@ -630,7 +651,7 @@ transporter.sendMail(mailOptions, (err, data) => {
 
 
   res.json(
-    {message: "Withdraw Transaction Successful"
+    {message: `${action} Transaction Successful`
   })
 
   })

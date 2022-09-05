@@ -5,6 +5,7 @@ var router = express.Router();
 var db = require('./database/db.js');
 const validateLoginMiddlewareCookie = require('./middleware/validate_login_cookie.js');
 const id = require('faker/lib/locales/id_ID/index.js');
+var upload = require('./middleware/multer.js');
 
 
 
@@ -59,27 +60,60 @@ const minimum_withdrawal_limit = req.body.minimum_withdrawal_limit
 const maximum_withdrawal_limit = req.body.maximum_withdrawal_limit
 
 
-value = [ currency_name,currency_code, currency_symbol,currency_type,currency_wallet_address,buy_rate,sell_rate,
+value1 = [currency_name,currency_code, currency_symbol,currency_type,currency_wallet_address,buy_rate,sell_rate,
   currency_exchange_rate,minimum_deposit_limit,maximum_deposit_limit,minimum_withdrawal_limit,maximum_withdrawal_limit]
 
 
-    db.query("CALL add_currency(?,?,?,?,?,?,?,?,?,?,?,?);", value,function (err, result){
+    db.query("CALL add_currency(?,?,?,?,?,?,?,?,?,?,?,?);", value1,function (err, result){
       if (err) throw err;
-    res.json(
-      {message: "Currencies",
-      Currencies_Info: result[0]
-         })
+    
+      var max = result[1][0].max_currency_id
+
+
+         if (req.file) { 
+          file = req.file
+      const params = {
+          Bucket:process.env.AWS_BUCKET_NAME,      
+          Key:Date.now() + '_' + file.originalname,              
+          Body:file.buffer,                   
+          ContentType:"image/jpeg"                
+     };
+    
+     // uploading the picture using s3 instance and saving the link in the database.
+      
+      s3.upload(params,(error,data)=>{
+          if(error){
+              res.status(500).send({"err":error}) 
+          }
+          
+      console.log(data)                     
+      
+     // saving the information in the database.   
+     value = [max,data.Location] 
+     db.query("CALL add_currency_icon(?,?);", value, function (err, result) {   
+    if (err) throw err; 
+
+    
+  
+  });  // end of database access
+      })
+  console.log('Successfully Uploaded')
+  }
 
        })
       } 
      })
     }
+    res.json(
+      {message: "Currencies",
+      Currencies_Info: result[0]
+         })
   
    })        
 
 
    
-/* protected route for active currencies under a particular currency type */
+/* protected route for active currencies under a particular currency type - this is for the user they only get to see active currencies */
 router.get('/currencies/:id',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
   if (req.userData) { 
     console.log(req.userData)
@@ -95,7 +129,27 @@ router.get('/currencies/:id',validateLoginMiddlewareCookie.isLoggedIn,(req,res) 
 
     })
     } 
-   })  
+   })
+   
+   
+
+/* protected route all currencies under a particular currency type - this is for the admin*/
+router.get('/admin-currencies/:id',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
+  if (req.userData) { 
+    console.log(req.userData)
+    const currency_type_id = req.params.id
+    value = [currency_type_id]
+    db.query("CALL get_admin_currencies(?);", value, function (err, result){
+      if (err) throw err;
+    console.log(result[0])
+    res.json(
+      {message: "Currency Types",
+      CurrencyTypeInfo: result[0]
+    })
+
+    })
+    } 
+   })     
 
 
 /*****************New****************************** */
@@ -112,7 +166,7 @@ router.get('/selected-currency-details/:id',validateLoginMiddlewareCookie.isLogg
     res.json(
       {message: "Selected Currency Details",
       CurrencyDetails: result[0]})
-
+    
     })
     } 
   
@@ -129,7 +183,7 @@ const currency_code = req.body.currency_code
 const currency_symbol = req.body.currency_symbol
 //const currency_icon = req.body.currency_icon
 const currency_type = req.body.currency_type
-//const currency_wallet_address = req.body.currency_wallet_address
+const currency_wallet_address = req.body.currency_wallet_address
 const buy_rate = req.body.buy_rate
 const sell_rate = req.body.sell_rate
 const currency_exchange_rate = req.body.currency_exchange_rate
@@ -140,11 +194,11 @@ const minimum_withdrawal_limit = req.body.minimum_withdrawal_limit
 const maximum_withdrawal_limit = req.body.maximum_withdrawal_limit
 
 
-value = [currency_id,currency_name,currency_code, currency_symbol,currency_type,currency_exchange_rate,buy_rate,
+value = [currency_id,currency_name,currency_code, currency_symbol,currency_type,currency_wallet_address,currency_exchange_rate,buy_rate,
   sell_rate,status,minimum_deposit_limit,maximum_deposit_limit,minimum_withdrawal_limit,maximum_withdrawal_limit]
 
 
-    db.query("CALL update_currency(?,?,?,?,?,?,?,?,?,?,?,?,?);", value,function (err, result){
+    db.query("CALL update_currency(?,?,?,?,?,?,?,?,?,?,?,?,?,?);", value,function (err, result){
       if (err) throw err;
     res.json(
       {message: "Currency Updated Details",
@@ -180,6 +234,76 @@ router.post('/update-currencies-type/:id',validateLoginMiddlewareCookie.isLogged
     } 
   
    })    
+
+
+/* protected route to delete selected currencies type  */
+router.post('/delete-currency-type/:id',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { 
+  if (req.userData) { 
+
+   const currency_type_id = req.params.id
+
+   values = [currency_type_id]
+    
+
+   db.query("CALL check_currency_type_status(?);", values,function (err, result){
+    if (err) throw err;
+    
+    console.log(result[0][0].v_output)
+    if (result[0][0].v_output === 1) {
+
+      return res.send('One of the Currencies under the selected Currency Type is on pending status. please complete transaction authorization before you can delete currency')
+     //res.send('Please verify your email take to verify page')
+   } 
+
+   else {
+
+    db.query("CALL delete_currencies_type(?);", values,function (err, result){
+      if (err) throw err;
+    res.json(
+      {message: "Currency Type deleted"})
+
+    })
+  }
+  })
+    } 
+  
+   })  
+   
+   
+/* protected route to delete selected currencies  */
+router.post('/delete-currency/:id',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { 
+  if (req.userData) { 
+
+   const currency_id = req.params.id
+
+   values = [currency_id]
+    
+
+   db.query("CALL check_currency_status(?);", values,function (err, result){
+    if (err) throw err;
+    
+    console.log(result[0][0].v_output)
+    if (result[0][0].v_output === 1) {
+
+      return res.send('Currency is on pending status. please complete transaction authorization before you can delete currency')
+     //res.send('Please verify your email take to verify page')
+   } 
+
+   else {
+
+    db.query("CALL delete_currency(?);", values,function (err, result){
+      if (err) throw err;
+    res.json(
+      {message: "Currency deleted"})
+
+    })
+  }
+  })
+    } 
+  
+   })      
+
+   
 
 
 
