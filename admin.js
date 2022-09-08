@@ -10,7 +10,7 @@ var upload = require('./middleware/multer.js');
 
 
 
-/* protected route for currency caategories or type */
+/* protected route for currency categories or type */
 router.get('/currency-type',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { // an example of a protected route
   if (req.userData) { 
     console.log(req.userData)
@@ -31,7 +31,7 @@ router.get('/currency-type',validateLoginMiddlewareCookie.isLoggedIn,(req,res) =
 
 
 /* protected route to add new currencies under a particular currency type */
-router.post('/add-currencies',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { 
+router.post('/add-currencies',validateLoginMiddlewareCookie.isLoggedIn,upload.single('productimage'),(req,res) => { 
   if (req.userData) { 
 
     db.query("CALL check_currency(?);",[req.body.currency_name], function (err, result){
@@ -109,7 +109,46 @@ value1 = [currency_name,currency_code, currency_symbol,currency_type,currency_wa
       Currencies_Info: result[0]
          })
   
-   })        
+   }) 
+   
+   
+
+/* protected route to add new currenc type under a particular currency type */
+router.post('/add-currencies-type',validateLoginMiddlewareCookie.isLoggedIn,upload.single('productimage'),(req,res) => { 
+  if (req.userData) { 
+
+    db.query("CALL check_currency_type(?);",[req.body.currency_name], function (err, result){
+      if (err) throw err;
+    
+      if (result[0][0].v_result === 1) {
+  
+         return res.send('Currency Type already exists')
+        //res.send('Please verify your email take to verify page')
+      } 
+      else {
+
+const currency_type_name = req.body.currency_type_name
+const buy_rate = req.body.buy_rate
+const sell_rate = req.body.sell_rate
+
+
+
+value = [currency_type_name,buy_rate,sell_rate]
+
+
+    db.query("CALL add_currency_type(?,?,?);", value,function (err, result){
+      if (err) throw err;
+
+       
+    res.json(
+      {message: "Currencies Types",
+      Currencies_Info: result[0]
+         })
+        })
+      } 
+     })
+    }
+   })  
 
 
    
@@ -173,7 +212,7 @@ router.get('/selected-currency-details/:id',validateLoginMiddlewareCookie.isLogg
    })     
    
    
-/* protected route to add new currencies under a particular currency type */
+/* protected route to add new currencies under a particular currency  */
 router.post('/update-currencies/:id',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { 
   if (req.userData) { 
 
