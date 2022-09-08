@@ -213,7 +213,7 @@ router.get('/selected-currency-details/:id',validateLoginMiddlewareCookie.isLogg
    
    
 /* protected route to add new currencies under a particular currency  */
-router.post('/update-currencies/:id',validateLoginMiddlewareCookie.isLoggedIn,(req,res) => { 
+router.post('/update-currencies/:id',validateLoginMiddlewareCookie.isLoggedIn,upload.single('productimage'),(req,res) => { 
   if (req.userData) { 
 
 const currency_id = req.params.id
@@ -239,6 +239,35 @@ value = [currency_id,currency_name,currency_code, currency_symbol,currency_type,
 
     db.query("CALL update_currency(?,?,?,?,?,?,?,?,?,?,?,?,?,?);", value,function (err, result){
       if (err) throw err;
+     
+      if (req.file) { 
+        file = req.file
+    const params = {
+        Bucket:process.env.AWS_BUCKET_NAME,      
+        Key:Date.now() + '_' + file.originalname,              
+        Body:file.buffer,                   
+        ContentType:"image/jpeg"                
+   };
+  
+   // uploading the picture using s3 instance and saving the link in the database.
+    
+    s3.upload(params,(error,data)=>{
+        if(error){
+            res.status(500).send({"err":error}) 
+        }
+        
+    console.log(data)                     
+    
+   // saving the information in the database.   
+   value = [currency_id,data.Location] 
+   db.query("CALL update_currency_icon(?,?);", value, function(err, result2) {   
+  if (err) throw err; 
+
+});  // end of database access
+    })
+console.log('Successfully Uploaded')
+}
+
     res.json(
       {message: "Currency Updated Details",
       Currency_Updated_Info: result[0]
