@@ -6,6 +6,7 @@ var db = require('./database/db.js');
 const validateLoginMiddlewareCookie = require('./middleware/validate_login_cookie.js');
 const id = require('faker/lib/locales/id_ID/index.js');
 var upload = require('./middleware/multer.js');
+const Aws = require('aws-sdk') 
 
 
 
@@ -232,6 +233,11 @@ const maximum_deposit_limit = req.body.maximum_deposit_limit
 const minimum_withdrawal_limit = req.body.minimum_withdrawal_limit
 const maximum_withdrawal_limit = req.body.maximum_withdrawal_limit
 
+const s3 = new Aws.S3({
+  accessKeyId:process.env.AWS_ACCESS_KEY_ID2,              
+  secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY2       
+})
+
 
 value = [currency_id,currency_name,currency_code, currency_symbol,currency_type,currency_wallet_address,currency_exchange_rate,buy_rate,
   sell_rate,status,minimum_deposit_limit,maximum_deposit_limit,minimum_withdrawal_limit,maximum_withdrawal_limit]
@@ -264,20 +270,103 @@ value = [currency_id,currency_name,currency_code, currency_symbol,currency_type,
   if (err) throw err; 
 
 });  // end of database access
-    })
+})
 console.log('Successfully Uploaded')
 }
 
     res.json(
       {message: "Currency Updated Details",
-      Currency_Updated_Info: result[0]
+      Currency_Updated_Info: result[0],
+      //Updated_Currency_Icon: result2[0]
 
     })
+  })
+ } 
+}) 
 
-    })
-    } 
+
+/* protected route to add new currencies under a particular currency  */
+router.post('/update-currencies2',validateLoginMiddlewareCookie.isLoggedIn,upload.single('productimage'),(req,res) => { 
+  if (req.userData) { 
+
+const currency_id = req.params.id
+const currency_name = req.body.currency_name
+const currency_code = req.body.currency_code
+const currency_symbol = req.body.currency_symbol
+const currency_type = req.body.currency_type
+const currency_wallet_address = req.body.currency_wallet_address
+const buy_rate = req.body.buy_rate
+const sell_rate = req.body.sell_rate
+const currency_exchange_rate = req.body.currency_exchange_rate
+const status = req.body.status
+const minimum_deposit_limit = req.body.minimum_deposit_limit
+const maximum_deposit_limit = req.body.maximum_deposit_limit
+const minimum_withdrawal_limit = req.body.minimum_withdrawal_limit
+const maximum_withdrawal_limit = req.body.maximum_withdrawal_limit
+
+
+     
+  if (req.file) { 
+        file = req.file
+    const params = {
+        Bucket:process.env.AWS_BUCKET_NAME,      
+        Key:Date.now() + '_' + file.originalname,              
+        Body:file.buffer,                   
+        ContentType:"image/jpeg"                
+   };
+
+   const s3 = new Aws.S3({
+    accessKeyId:process.env.AWS_ACCESS_KEY_ID2,              
+    secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY2       
+  })
   
-   })      
+   // uploading the picture using s3 instance and saving the link in the database.
+    
+    s3.upload(params,(error,data)=>{
+        if(error){
+            res.status(500).send({"err":error}) 
+        }
+        
+    console.log(data)  
+    
+    console.log('Successfully Uploaded')
+
+    value = [currency_id,currency_name,currency_code, currency_symbol,currency_type,currency_wallet_address,currency_exchange_rate,buy_rate,
+      sell_rate,status,minimum_deposit_limit,maximum_deposit_limit,minimum_withdrawal_limit,maximum_withdrawal_limit,data.Location]
+    
+    db.query("CALL update_currency_all(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);", value,function (err, result){
+      if (err) throw err;
+
+
+    res.json(
+      {message: "Currency Updated Details",
+      Currency_Updated_Info: result[0]
+    })
+
+   })
+
+  })
+ }
+
+ else {
+
+  value = [currency_id,currency_name,currency_code, currency_symbol,currency_type,currency_wallet_address,currency_exchange_rate,buy_rate,
+    sell_rate,status,minimum_deposit_limit,maximum_deposit_limit,minimum_withdrawal_limit,maximum_withdrawal_limit]
+  
+  db.query("CALL update_currency(?,?,?,?,?,?,?,?,?,?,?,?,?,?);", value,function (err, result){
+    if (err) throw err;
+
+
+  res.json(
+    {message: "Currency Updated Details",
+    Currency_Updated_Info: result[0]
+   })
+
+  })
+
+ }
+} 
+}) 
 
 
  
@@ -946,6 +1035,106 @@ router.get('/currency-search/:id',validateLoginMiddlewareCookie.isLoggedIn,(req,
     })
     } 
   })    
+
+
+
+router.get('/currency-icon-upload',(req,res) => { 
+       
+    res.render('currency_icon',{title: 'Currency Icon upload'})
+   
+   }) 
+
+
+
+/* protected route to add new currencies under a particular currency  */
+router.post('/update-currencies222',validateLoginMiddlewareCookie.isLoggedIn,upload.single('productimage'),(req,res) => { 
+  if (req.userData) { 
+
+const currency_id = req.params.id
+const currency_name = req.body.currency_name
+const currency_code = req.body.currency_code
+const currency_symbol = req.body.currency_symbol
+const currency_type = req.body.currency_type
+const currency_wallet_address = req.body.currency_wallet_address
+const buy_rate = req.body.buy_rate
+const sell_rate = req.body.sell_rate
+const currency_exchange_rate = req.body.currency_exchange_rate
+const status = req.body.status
+const minimum_deposit_limit = req.body.minimum_deposit_limit
+const maximum_deposit_limit = req.body.maximum_deposit_limit
+const minimum_withdrawal_limit = req.body.minimum_withdrawal_limit
+const maximum_withdrawal_limit = req.body.maximum_withdrawal_limit
+
+
+     
+  if (req.file) { 
+        file = req.file
+    const params = {
+        Bucket:process.env.AWS_BUCKET_NAME,      
+        Key:Date.now() + '_' + file.originalname,              
+        Body:file.buffer,                   
+        ContentType:"image/jpeg"                
+   };
+
+   const s3 = new Aws.S3({
+    accessKeyId:process.env.AWS_ACCESS_KEY_ID2,              
+    secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY2       
+  })
+  
+   // uploading the picture using s3 instance and saving the link in the database.
+    
+    s3.upload(params,(error,data)=>{
+        if(error){
+            res.status(500).send({"err":error}) 
+        }
+        
+    console.log(data)  
+    
+    console.log('Successfully Uploaded')
+
+    value = [currency_id,currency_name,currency_code, currency_symbol,currency_type,currency_wallet_address,currency_exchange_rate,buy_rate,
+      sell_rate,status,minimum_deposit_limit,maximum_deposit_limit,minimum_withdrawal_limit,maximum_withdrawal_limit,data.Location]
+    
+    db.query("CALL update_currency_all(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);", value,function (err, result){
+      if (err) throw err;
+
+
+    res.json(
+      {message: "Currency Updated Details",
+      Currency_Updated_Info: result[0]
+    })
+
+   })
+
+  })
+ }
+
+ else {
+
+  value = [currency_id,currency_name,currency_code, currency_symbol,currency_type,currency_wallet_address,currency_exchange_rate,buy_rate,
+    sell_rate,status,minimum_deposit_limit,maximum_deposit_limit,minimum_withdrawal_limit,maximum_withdrawal_limit]
+  
+  db.query("CALL update_currency(?,?,?,?,?,?,?,?,?,?,?,?,?,?);", value,function (err, result){
+    if (err) throw err;
+
+
+  res.json(
+    {message: "Currency Updated Details",
+    Currency_Updated_Info: result[0]
+   })
+
+  })
+
+ }
+} 
+})      
+
+
+
+
+
+
+
 
 
    
