@@ -286,7 +286,7 @@ console.log('Successfully Uploaded')
 
 
 /* protected route to add new currencies under a particular currency  */
-router.post('/update-currencies2',validateLoginMiddlewareCookie.isLoggedIn,upload.single('productimage'),(req,res) => { 
+router.post('/update-currencies2/:id',validateLoginMiddlewareCookie.isLoggedIn,upload.single('productimage'),(req,res) => { 
   if (req.userData) { 
 
 const currency_id = req.params.id
@@ -340,7 +340,8 @@ const maximum_withdrawal_limit = req.body.maximum_withdrawal_limit
 
     res.json(
       {message: "Currency Updated Details",
-      Currency_Updated_Info: result[0]
+      Currency_Updated_Info: result[0],
+      Currencies:result[1]
     })
 
    })
@@ -359,7 +360,8 @@ const maximum_withdrawal_limit = req.body.maximum_withdrawal_limit
 
   res.json(
     {message: "Currency Updated Details",
-    Currency_Updated_Info: result[0]
+    Currency_Updated_Info: result[0],
+    Currencies:result[1]
    })
 
   })
