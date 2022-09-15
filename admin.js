@@ -74,7 +74,7 @@ value1 = [currency_name,currency_code, currency_symbol,currency_type,currency_wa
          if (req.file) { 
           file = req.file
       const params = {
-          Bucket:process.env.AWS_BUCKET_NAME,      
+          Bucket:process.env.AWS_BUCKET_NAME3,      
           Key:Date.now() + '_' + file.originalname,              
           Body:file.buffer,                   
           ContentType:"image/jpeg"                
@@ -234,8 +234,8 @@ const minimum_withdrawal_limit = req.body.minimum_withdrawal_limit
 const maximum_withdrawal_limit = req.body.maximum_withdrawal_limit
 
 const s3 = new Aws.S3({
-  accessKeyId:process.env.AWS_ACCESS_KEY_ID2,              
-  secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY2       
+  accessKeyId:process.env.AWS_ACCESS_KEY_ID3,              
+  secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY3       
 })
 
 
@@ -249,7 +249,7 @@ value = [currency_id,currency_name,currency_code, currency_symbol,currency_type,
       if (req.file) { 
         file = req.file
     const params = {
-        Bucket:process.env.AWS_BUCKET_NAME,      
+        Bucket:process.env.AWS_BUCKET_NAME3,      
         Key:Date.now() + '_' + file.originalname,              
         Body:file.buffer,                   
         ContentType:"image/jpeg"                
@@ -309,15 +309,15 @@ const maximum_withdrawal_limit = req.body.maximum_withdrawal_limit
   if (req.file) { 
         file = req.file
     const params = {
-        Bucket:process.env.AWS_BUCKET_NAME,      
+        Bucket:process.env.AWS_BUCKET_NAME3,      
         Key:Date.now() + '_' + file.originalname,              
         Body:file.buffer,                   
         ContentType:"image/jpeg"                
    };
 
    const s3 = new Aws.S3({
-    accessKeyId:process.env.AWS_ACCESS_KEY_ID2,              
-    secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY2       
+    accessKeyId:process.env.AWS_ACCESS_KEY_ID3,              
+    secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY3       
   })
   
    // uploading the picture using s3 instance and saving the link in the database.
@@ -1072,15 +1072,15 @@ const maximum_withdrawal_limit = req.body.maximum_withdrawal_limit
   if (req.file) { 
         file = req.file
     const params = {
-        Bucket:process.env.AWS_BUCKET_NAME,      
+        Bucket:process.env.AWS_BUCKET_NAME3,      
         Key:Date.now() + '_' + file.originalname,              
         Body:file.buffer,                   
         ContentType:"image/jpeg"                
    };
 
    const s3 = new Aws.S3({
-    accessKeyId:process.env.AWS_ACCESS_KEY_ID2,              
-    secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY2       
+    accessKeyId:process.env.AWS_ACCESS_KEY_ID3,              
+    secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY3       
   })
   
    // uploading the picture using s3 instance and saving the link in the database.

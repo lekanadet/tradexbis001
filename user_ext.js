@@ -241,15 +241,15 @@ if(amount_naira > 100000){ //Checking if the is more than 100,000 naira
       var currency = result[1][0].v_currency_name3
 
       const s3 = new Aws.S3({
-        accessKeyId:process.env.AWS_ACCESS_KEY_ID2,              
-        secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY2       
+        accessKeyId:process.env.AWS_ACCESS_KEY_ID3,              
+        secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY3       
     })
   
   
       if (req.file) { 
           file = req.file
       const params = {
-          Bucket:process.env.AWS_BUCKET_NAME,      
+          Bucket:process.env.AWS_BUCKET_NAME3,      
           Key:Date.now() + '_' + file.originalname,              
           Body:file.buffer,                   
           ContentType:"image/jpeg"                
@@ -339,15 +339,15 @@ Admin;</p>
       var currency = result[1][0].v_currency_name3
 
     const s3 = new Aws.S3({
-      accessKeyId:process.env.AWS_ACCESS_KEY_ID2,              
-      secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY2       
+      accessKeyId:process.env.AWS_ACCESS_KEY_ID3,              
+      secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY3       
   })
 
 
     if (req.file) { 
         file = req.file
     const params = {
-        Bucket:process.env.AWS_BUCKET_NAME,      
+        Bucket:process.env.AWS_BUCKET_NAME3,      
         Key:Date.now() + '_' + file.originalname,             
         Body:file.buffer,                  
         ContentType:"image/jpeg"              
@@ -475,15 +475,15 @@ router.post('/withdraw/:id',validateLoginMiddlewareCookie.isLoggedIn,upload.sing
       var currency = result[1][0].v_currency_name3
 
       const s3 = new Aws.S3({
-        accessKeyId:process.env.AWS_ACCESS_KEY_ID2,              
-        secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY2       
+        accessKeyId:process.env.AWS_ACCESS_KEY_ID3,              
+        secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY3       
     })
   
   
       if (req.file) { 
           file = req.file
       const params = {
-          Bucket:process.env.AWS_BUCKET_NAME,      
+          Bucket:process.env.AWS_BUCKET_NAME3,      
           Key:Date.now() + '_' + file.originalname,               
           Body:file.buffer,                  
           ContentType:"image/jpeg"                
@@ -573,15 +573,15 @@ transporter.sendMail(mailOptions, (err, data) => {
       var currency = result[1][0].v_currency_name3
 
     const s3 = new Aws.S3({
-      accessKeyId:process.env.AWS_ACCESS_KEY_ID2,              
-      secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY2       
+      accessKeyId:process.env.AWS_ACCESS_KEY_ID3,              
+      secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY3       
   })
 
 
     if (req.file) { 
         file = req.file
     const params = {
-        Bucket:process.env.AWS_BUCKET_NAME,     
+        Bucket:process.env.AWS_BUCKET_NAME333,     
         Key:Date.now() + '_' + file.originalname,          
         Body:file.buffer,                 
         ContentType:"image/jpeg"                
@@ -686,15 +686,15 @@ router.post('/update-profile',validateLoginMiddlewareCookie.isLoggedIn,upload.si
    const phone_no = req.body.phone_no
 
 const s3 = new Aws.S3({
-  accessKeyId:process.env.AWS_ACCESS_KEY_ID2,              
-  secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY2       
+  accessKeyId:process.env.AWS_ACCESS_KEY_ID3,              
+  secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY3       
 })
 
 
 if (req.file) { 
   file = req.file
 const params = {
-  Bucket:process.env.AWS_BUCKET_NAME,      
+  Bucket:process.env.AWS_BUCKET_NAME333,      
   Key:Date.now() + '_' + file.originalname,              
   Body:file.buffer,                   
   ContentType:"image/jpeg"                
@@ -748,17 +748,17 @@ router.get('/id-upload',(req,res) => {
  })   
 
  
+//validateLoginMiddlewareCookie.isLoggedIn,
+router.post('/id-upload',upload.single('productimage'),(req,res) => { 
 
-router.post('/id-upload',validateLoginMiddlewareCookie.isLoggedIn,upload.single('productimage'),(req,res) => { 
-
-  if (req.userData) { 
+ // if (req.userData) { 
  
-    //user_id = 26
-  user_id = req.userData.userId
+    user_id = 27
+ // user_id = req.userData.userId
 
-  const s3 = new Aws.S3({
-    accessKeyId:process.env.AWS_ACCESS_KEY_ID2,              
-    secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY2       
+    const s3 = new Aws.S3({
+    accessKeyId:process.env.AWS_ACCESS_KEY_ID3,              
+    secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY3       
   })
 
   db.query("CALL check_id_verified(?);", [user_id], function (err, result) {   
@@ -789,8 +789,9 @@ router.post('/id-upload',validateLoginMiddlewareCookie.isLoggedIn,upload.single(
     
 
     file = req.file
-const params = {
-    Bucket:process.env.AWS_BUCKET_NAME,      
+
+    const params = {
+    Bucket:process.env.AWS_BUCKET_NAME3,      
     Key:Date.now() + '_' + file.originalname,              
     Body:file.buffer,                   
     ContentType:"image/jpeg"                
@@ -831,7 +832,7 @@ res.json(
     })
    }
   })
-    }
+  //  }
  // }     
 })      
 
@@ -880,15 +881,15 @@ router.post('/depositt',upload.single('productimage'),(req,res) => { // testing 
        var deposit_id = result[0][0].v_deposit_id3
  
        const s3 = new Aws.S3({
-         accessKeyId:process.env.AWS_ACCESS_KEY_ID2,              
-         secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY2       
+         accessKeyId:process.env.AWS_ACCESS_KEY_ID3,              
+         secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY3       
      })
    
    
        if (req.file) { 
            file = req.file
        const params = {
-           Bucket:process.env.AWS_BUCKET_NAME,      // bucket that we made earlier
+           Bucket:process.env.AWS_BUCKET_NAME333,      // bucket that we made earlier
            Key:Date.now() + '_' + file.originalname,               // Name of the image
            Body:file.buffer,                   // defining the permissions to get the public link
            ContentType:"image/jpeg"                 // Necessary to define the image content-type to view the photo in the browser with the link
@@ -933,15 +934,15 @@ router.post('/depositt',upload.single('productimage'),(req,res) => { // testing 
      var deposit_id = result[0][0].v_deposit_id3
  
      const s3 = new Aws.S3({
-       accessKeyId:process.env.AWS_ACCESS_KEY_ID2,              
-       secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY2       
+       accessKeyId:process.env.AWS_ACCESS_KEY_ID3,              
+       secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY3       
    })
  
  
      if (req.file) { 
          file = req.file
      const params = {
-         Bucket:process.env.AWS_BUCKET_NAME,      // bucket that we made earlier
+         Bucket:process.env.AWS_BUCKET_NAME333,      // bucket that we made earlier
          Key:Date.now() + '_' + file.originalname,               // Name of the image
          Body:file.buffer,                   // defining the permissions to get the public link
          ContentType:"image/jpeg"                 // Necessary to define the image content-type to view the photo in the browser with the link
@@ -976,6 +977,73 @@ router.post('/depositt',upload.single('productimage'),(req,res) => { // testing 
  
    }
   // }
-    })      
+    })   
+    
+    
+
+
+/* protected route to get user's deposit transactions history */
+router.post('/send-email',(req,res) => { // an example of a protected route
+
+  //user_id = req.params.id
+  var email_list = []
+  db.query("CALL get_emails();",function (err, result){
+    if (err) throw err;
+    for (i in result[0]){
+      email_list.push(result[0][i].email)
+    }
+
+  // console.log(result)
+  // console.log(result[0])
+  // console.log(result[0][0])
+ 
+
+ 
+//step 1 
+var transporter = nodemailer.createTransport({
+  host: "relay.mailbaby.net",
+  port: 2525,
+  auth: {
+    user: process.env.MAIL_USER,
+    pass: process.env.MAIL_PASSWORD,
+  },
+});
+
+
+let mailOptions = {
+  from: "admin@tradexbis.com", 
+  to: email_list, 
+  subject: "KYC NOTIFICATION",
+//text: body,
+  html: `<p>Dears,</p>
+<br/>
+<p>We wish to inform you that we appriciate your presence.
+<br>
+Enjoy trading....
+<br>
+Regards,
+<br>
+Admin;</p>
+`,
+};
+
+console.log(mailOptions);
+
+
+// Step 3
+transporter.sendMail(mailOptions, (err, data) => {
+  if (err) {
+    return console.log("Error occurs", err);
+  }
+  return console.log("Email sent!!!");
+});
+
+  res.json(
+    {message: "Email Sent",
+    result: result[0]
+  })
+
+  })
+})      
    
    module.exports = router;   
