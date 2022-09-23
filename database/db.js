@@ -2,10 +2,10 @@
 var mysql = require('mysql')
 
 var con = mysql.createConnection({  
-    host: "tradexbis-db.cjh2cih5udvp.us-east-1.rds.amazonaws.com",  
-    user: "admin",  
-    password: "Kolapoishola123$",
-    database: "tradexbis",
+    host: "",  
+    user: "",  
+    password: "",
+    database: "",
     multipleStatements: true
   });   
 
